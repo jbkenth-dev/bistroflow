@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 224 71.4% 4.1%;
+  --card: 0 0% 100%;
+  --card-foreground: 224 71.4% 4.1%;
+  --primary: 28 100% 50%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 222.2 47.4% 11.2%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 28 100% 96%;
+  --accent-foreground: 28 100% 20%;
+}
+
+.dark {
+  --background: 222.2 84% 4.5%;
+  --foreground: 210 40% 98%;
+  --card: 222.2 84% 5%;
+  --card-foreground: 210 40% 98%;
+  --primary: 28 100% 52%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --accent: 28 100% 18%;
+  --accent-foreground: 28 100% 96%;
+}
+
+body {
+  @apply bg-background text-foreground antialiased;
+}
+
+.glass {
+  @apply bg-white/10 backdrop-blur-md shadow-glass border border-white/10;
+}
+
+.container-edge {
+  @apply container mx-auto px-4;
+}
+
+nextjs-portal {
+  display: contents !important;
+  pointer-events: none !important;
+}
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background-color: #e9edf3;
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.7), transparent);
+  transform: translateX(-100%);
+  animation: shimmer 1.2s ease-in-out infinite;
+}
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+
+/* Text glow utilities */
+.text-glow {
+  text-shadow: 0 0 8px rgba(255,255,255,0.85), 0 0 14px rgba(255,165,0,0.55);
+}
+.text-glow-strong {
+  text-shadow:
+    0 0 10px rgba(255,255,255,0.95),
+    0 0 18px rgba(255,165,0,0.65),
+    0 0 28px rgba(255,140,0,0.5);
+}
+
+/* Black glow variants */
+.text-glow-black {
+  text-shadow: 0 0 6px rgba(0,0,0,0.6), 0 0 12px rgba(0,0,0,0.45);
+}
+.text-glow-black-strong {
+  text-shadow:
+    0 0 10px rgba(0,0,0,0.7),
+    0 0 18px rgba(0,0,0,0.6),
+    0 0 28px rgba(0,0,0,0.5);
+}
