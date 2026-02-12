@@ -32,16 +32,24 @@
   --accent-foreground: 28 100% 96%;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  @apply bg-background text-foreground antialiased;
+  @apply bg-background text-foreground antialiased selection:bg-primary/30;
 }
 
 .glass {
-  @apply bg-white/10 backdrop-blur-md shadow-glass border border-white/10;
+  @apply bg-white/10 backdrop-blur-md shadow-glass border border-white/10 transition-all duration-300;
+}
+
+.glass:hover {
+  @apply bg-white/15 border-white/20;
 }
 
 .container-edge {
-  @apply container mx-auto px-4;
+  @apply container mx-auto px-4 sm:px-6 lg:px-8;
 }
 
 nextjs-portal {
