@@ -166,17 +166,6 @@ export function CartFloating() {
           </motion.span>
         )}
       </motion.button>
-      {distinctCount > 0 && (
-        <motion.div
-          initial={{ opacity: 0, x: 10 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: 10 }}
-          className="rounded-xl px-3 py-2 bg-white text-black shadow-md inline-flex items-center gap-1 z-50"
-        >
-          <IconPeso className="h-[1em] w-[1em] align-middle" />
-          <span className="font-semibold">{grand.toFixed(2)}</span>
-        </motion.div>
-      )}
     </div>
     </>
   );

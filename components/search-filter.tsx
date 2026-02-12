@@ -20,7 +20,7 @@ export function SearchFilter({ value, onChange }: { value: FilterState; onChange
     <div className="glass rounded-2xl p-4 grid md:grid-cols-4 gap-3">
       <input
         className="rounded-xl px-3 py-2 bg-transparent border border-white/10"
-        placeholder="Search dishes..."
+        placeholder="Search Food"
         value={local.q}
         onChange={(e) => update({ q: e.target.value })}
       />

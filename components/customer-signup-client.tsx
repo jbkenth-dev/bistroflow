@@ -1,12 +1,16 @@
  "use client";
 
  import { motion } from "framer-motion";
- import Link from "next/link";
- import { useMemo, useState } from "react";
- import { IconEye, IconEyeOff } from "@/components/ui/icons";
+import Link from "next/link";
+import Image from "next/image";
+import { useMemo, useState } from "react";
+import { IconEye, IconEyeOff } from "@/components/ui/icons";
+import { Particles } from "@/components/ui/particles";
 
- export function CustomerSignupClient() {
-   const [name, setName] = useState("");
+export function CustomerSignupClient() {
+   const [firstName, setFirstName] = useState("");
+   const [middleName, setMiddleName] = useState("");
+   const [lastName, setLastName] = useState("");
    const [email, setEmail] = useState("");
    const [pwd, setPwd] = useState("");
    const [pwd2, setPwd2] = useState("");
@@ -25,9 +29,10 @@
    }, [pwd]);
    const pct = useMemo(() => Math.round((score / 5) * 100), [score]);
    const label = score <= 2 ? "Weak" : score === 3 ? "Medium" : "Strong";
-   const canSubmit = name && email && pwd && pwd2 && pwd === pwd2 && score >= 3 && status !== "loading";
+  const canSubmit = firstName && lastName && email && pwd && pwd2 && pwd === pwd2 && score >= 3 && status !== "loading";
+  const barColor = score <= 2 ? "bg-red-500" : score === 3 ? "bg-yellow-500" : "bg-green-500";
 
-   async function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent) {
      e.preventDefault();
      if (!canSubmit) return;
      setStatus("loading");
@@ -35,77 +40,278 @@
      await new Promise((r) => setTimeout(r, 1000));
      setStatus("success");
    }
-   const barColor = score <= 2 ? "bg-red-500" : score === 3 ? "bg-yellow-500" : "bg-green-500";
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
 
-   return (
-     <section aria-labelledby="signup-title" className="relative h-[100dvh] overflow-hidden">
-       <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-transparent pointer-events-none" />
-       <div className="relative z-10 h-full flex items-center">
-         <div className="container-edge w-full">
-           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="max-w-md mx-auto w-full">
-            <motion.div initial={{ scale: 0.98, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 420, damping: 32 }} className="glass rounded-2xl p-6 shadow-md hover:shadow-lg transition-shadow backdrop-blur">
-               <div className="text-center">
-                 <Link href="/" className="font-display text-xl font-bold tracking-tight">
-                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-400 to-orange-600">BISTRO</span>
-                   <span className="text-black">FLOW</span>
-                 </Link>
-                 <h1 id="signup-title" className="mt-2 font-display text-2xl md:text-3xl font-bold tracking-tight">Create Account</h1>
-                 <p className="mt-1 text-sm opacity-80">Join Bistroflow to order faster.</p>
-               </div>
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+  };
 
-               <form className="mt-4 space-y-4" onSubmit={onSubmit} aria-describedby={errorMsg ? "signup-error" : undefined}>
-                 <div>
-                   <label htmlFor="signup-name" className="block text-sm opacity-80 mb-1">Full Name</label>
-                   <input id="signup-name" type="text" className="w-full glass rounded-xl px-3 py-2 border border-white/10 focus:ring-2 focus:ring-primary/50 outline-none" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} />
-                 </div>
-                 <div>
-                   <label htmlFor="signup-email" className="block text-sm opacity-80 mb-1">Email</label>
-                   <input id="signup-email" type="email" className="w-full glass rounded-xl px-3 py-2 border border-white/10 focus:ring-2 focus:ring-primary/50 outline-none" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
-                 </div>
-                 <div>
-                   <label htmlFor="signup-password" className="block text-sm opacity-80 mb-1">Password</label>
-                   <div className="relative">
-                     <input id="signup-password" type={show1 ? "text" : "password"} className="w-full glass rounded-xl px-3 py-2 pr-12 border border-white/10 focus:ring-2 focus:ring-primary/50 outline-none" placeholder="Enter password" value={pwd} onChange={(e) => setPwd(e.target.value)} aria-invalid={status === "error" ? "true" : "false"} />
-                     <motion.button type="button" onClick={() => setShow1((v) => !v)} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} aria-label={show1 ? "Hide password" : "Show password"} className="absolute inset-y-0 right-2 flex items-center p-1 rounded-md hover:bg-white/5">
-                       {show1 ? <IconEyeOff className="w-5 h-5" /> : <IconEye className="w-5 h-5" />}
-                     </motion.button>
-                   </div>
-                   <div className="mt-3">
-                     <div className="flex items-center justify-between">
-                       <span className="text-sm opacity-80">Strength: {label}</span>
-                       <span className="text-xs opacity-60">{pct}%</span>
-                     </div>
-                     <div className="mt-2 h-2 w-full rounded-full bg-white/10 overflow-hidden">
-                       <motion.div initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ type: "spring", stiffness: 260, damping: 30 }} className={`h-full ${barColor}`} />
-                     </div>
-                   </div>
-                 </div>
-                 <div>
-                   <label htmlFor="signup-password-2" className="block text-sm opacity-80 mb-1">Confirm Password</label>
-                   <div className="relative">
-                     <input id="signup-password-2" type={show2 ? "text" : "password"} className="w-full glass rounded-xl px-3 py-2 pr-12 border border-white/10 focus:ring-2 focus:ring-primary/50 outline-none" placeholder="Re-enter password" value={pwd2} onChange={(e) => setPwd2(e.target.value)} aria-invalid={status === "error" ? "true" : "false"} />
-                     <motion.button type="button" onClick={() => setShow2((v) => !v)} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} aria-label={show2 ? "Hide password" : "Show password"} className="absolute inset-y-0 right-2 flex items-center p-1 rounded-md hover:bg-white/5">
-                       {show2 ? <IconEyeOff className="w-5 h-5" /> : <IconEye className="w-5 h-5" />}
-                     </motion.button>
-                   </div>
-                 </div>
+  return (
+    <section className="min-h-screen flex items-center justify-center p-4 md:p-8 bg-black/5 dark:bg-black/20 overflow-hidden relative">
+      <div className="absolute inset-0 pointer-events-none">
+        <Particles count={20} className="opacity-50" />
+      </div>
 
-                 {pwd && pwd2 && pwd !== pwd2 ? <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-red-500">Passwords do not match.</motion.div> : null}
-                 {errorMsg ? <motion.div id="signup-error" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-red-500">{errorMsg}</motion.div> : null}
-                 {status === "success" ? <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-green-500">Account created</motion.div> : null}
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+        className="w-full max-w-5xl flex flex-col md:flex-row glass rounded-[2.5rem] overflow-hidden shadow-2xl relative z-10 border border-white/20"
+      >
+        {/* Brand Side */}
+        <div className="hidden md:flex md:w-1/2 bg-primary relative p-12 flex-col justify-between overflow-hidden">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="absolute -right-20 -bottom-20 w-80 h-80 bg-white/10 rounded-full blur-3xl"
+          />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
+            className="absolute -left-20 -top-20 w-64 h-64 bg-orange-400/20 rounded-full blur-3xl"
+          />
 
-                 <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} disabled={!canSubmit} aria-busy={status === "loading" ? "true" : "false"} className="mt-2 w-full rounded-xl bg-primary text-primary-foreground px-4 py-3 inline-flex items-center justify-center disabled:opacity-60">
-                   {status === "loading" ? "Creating…" : "Create Account"}
-                 </motion.button>
-               </form>
+          <div className="relative z-10">
+            <Link href="/" className="font-display text-2xl font-bold tracking-tight flex items-center gap-3">
+              <div className="w-10 h-10 relative rounded-xl overflow-hidden shadow-lg shadow-black/20">
+                <Image
+                  src="/assets/bistroflow-logo.jpg"
+                  alt="Bistroflow Logo"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <span className="text-white">BISTRO</span>
+              <span className="text-black/80">FLOW</span>
+            </Link>
+          </div>
 
-               <div className="mt-4 text-center text-sm">
-                 <Link href="/login" className="glass rounded-xl px-3 py-2 inline-block hover:bg-accent/50">Already have an account? Sign in</Link>
-               </div>
-             </motion.div>
-           </motion.div>
-         </div>
-       </div>
-     </section>
-   );
+          <div className="relative z-10">
+            <motion.h2
+              variants={itemVariants}
+              className="font-display text-4xl lg:text-5xl font-bold text-white leading-tight"
+            >
+              Taste the future <br /> of dining.
+            </motion.h2>
+            <motion.p variants={itemVariants} className="mt-6 text-white/80 text-lg max-w-sm">
+              Join thousands of food lovers and experience the most seamless way to order your favorite dishes.
+            </motion.p>
+          </div>
+
+          <div className="relative z-10 flex gap-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="w-12 h-1 bg-white/30 rounded-full overflow-hidden">
+                {i === 1 && <motion.div initial={{ width: 0 }} animate={{ width: "100%" }} transition={{ duration: 3, repeat: Infinity }} className="h-full bg-white" />}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Form Side */}
+        <div className="w-full md:w-1/2 p-8 md:p-12 lg:p-16 bg-white/50 dark:bg-black/50 backdrop-blur-xl">
+          <div className="max-w-md mx-auto">
+            <motion.div variants={itemVariants} className="md:hidden mb-8">
+              <Link href="/" className="font-display text-xl font-bold tracking-tight flex items-center gap-2">
+                <div className="w-8 h-8 relative rounded-lg overflow-hidden shadow-md">
+                  <Image
+                    src="/assets/bistroflow-logo.jpg"
+                    alt="Bistroflow Logo"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-orange-600">BISTRO</span>
+                <span className="text-foreground">FLOW</span>
+              </Link>
+            </motion.div>
+
+            <motion.div variants={itemVariants}>
+              <h1 id="signup-title" className="font-display text-3xl font-bold tracking-tight text-foreground">
+                Create Account
+              </h1>
+              <p className="mt-2 text-muted-foreground">Join Bistroflow and start your culinary journey.</p>
+            </motion.div>
+
+            <form className="mt-8 space-y-5" onSubmit={onSubmit} aria-describedby={errorMsg ? "signup-error" : undefined}>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <motion.div variants={itemVariants}>
+                  <label htmlFor="signup-firstname" className="block text-sm font-medium mb-2 text-foreground/80">
+                    First Name
+                  </label>
+                  <input
+                    id="signup-firstname"
+                    type="text"
+                    required
+                    className="w-full bg-white/50 dark:bg-white/5 rounded-2xl px-4 py-3 border border-white/20 focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all"
+                    placeholder="John"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                  />
+                </motion.div>
+
+                <motion.div variants={itemVariants}>
+                  <label htmlFor="signup-middlename" className="block text-sm font-medium mb-2 text-foreground/80">
+                    Middle Name
+                  </label>
+                  <input
+                    id="signup-middlename"
+                    type="text"
+                    className="w-full bg-white/50 dark:bg-white/5 rounded-2xl px-4 py-3 border border-white/20 focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all"
+                    placeholder="Quincy"
+                    value={middleName}
+                    onChange={(e) => setMiddleName(e.target.value)}
+                  />
+                </motion.div>
+
+                <motion.div variants={itemVariants}>
+                  <label htmlFor="signup-lastname" className="block text-sm font-medium mb-2 text-foreground/80">
+                    Last Name
+                  </label>
+                  <input
+                    id="signup-lastname"
+                    type="text"
+                    required
+                    className="w-full bg-white/50 dark:bg-white/5 rounded-2xl px-4 py-3 border border-white/20 focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all"
+                    placeholder="Doe"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                  />
+                </motion.div>
+              </div>
+
+              <motion.div variants={itemVariants}>
+                <label htmlFor="signup-email" className="block text-sm font-medium mb-2 text-foreground/80">
+                  Email Address
+                </label>
+                <input
+                  id="signup-email"
+                  type="email"
+                  required
+                  className="w-full bg-white/50 dark:bg-white/5 rounded-2xl px-4 py-3 border border-white/20 focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all"
+                  placeholder="name@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </motion.div>
+
+              <motion.div variants={itemVariants}>
+                <label htmlFor="signup-password" className="block text-sm font-medium mb-2 text-foreground/80">
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    id="signup-password"
+                    type={show1 ? "text" : "password"}
+                    required
+                    className="w-full bg-white/50 dark:bg-white/5 rounded-2xl px-4 py-3 pr-12 border border-white/20 focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all"
+                    placeholder="••••••••"
+                    value={pwd}
+                    onChange={(e) => setPwd(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShow1((v) => !v)}
+                    className="absolute inset-y-0 right-3 flex items-center p-2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {show1 ? <IconEyeOff className="w-5 h-5" /> : <IconEye className="w-5 h-5" />}
+                  </button>
+                </div>
+
+                <div className="mt-3">
+                  <div className="flex items-center justify-between text-xs mb-1.5">
+                    <span className="text-muted-foreground">Strength: <span className="font-semibold text-foreground">{label}</span></span>
+                    <span className="text-muted-foreground font-medium">{pct}%</span>
+                  </div>
+                  <div className="h-1.5 w-full rounded-full bg-black/5 dark:bg-white/5 overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${pct}%` }}
+                      className={`h-full rounded-full transition-colors duration-500 ${barColor}`}
+                    />
+                  </div>
+                </div>
+              </motion.div>
+
+              <motion.div variants={itemVariants}>
+                <label htmlFor="signup-password-2" className="block text-sm font-medium mb-2 text-foreground/80">
+                  Confirm Password
+                </label>
+                <div className="relative">
+                  <input
+                    id="signup-password-2"
+                    type={show2 ? "text" : "password"}
+                    required
+                    className="w-full bg-white/50 dark:bg-white/5 rounded-2xl px-4 py-3 pr-12 border border-white/20 focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all"
+                    placeholder="••••••••"
+                    value={pwd2}
+                    onChange={(e) => setPwd2(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShow2((v) => !v)}
+                    className="absolute inset-y-0 right-3 flex items-center p-2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {show2 ? <IconEyeOff className="w-5 h-5" /> : <IconEye className="w-5 h-5" />}
+                  </button>
+                </div>
+              </motion.div>
+
+              {pwd && pwd2 && pwd !== pwd2 && (
+                <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-xs text-destructive">
+                  Passwords do not match.
+                </motion.p>
+              )}
+
+              <motion.div variants={itemVariants} className="pt-2">
+                <button
+                  type="submit"
+                  disabled={!canSubmit}
+                  className="w-full bg-primary text-primary-foreground font-semibold rounded-2xl px-6 py-4 shadow-xl shadow-primary/20 hover:shadow-primary/30 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100 transition-all flex items-center justify-center gap-2"
+                >
+                  {status === "loading" ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Creating Account...
+                    </>
+                  ) : (
+                    "Create Account"
+                  )}
+                </button>
+              </motion.div>
+            </form>
+
+            <motion.div variants={itemVariants} className="mt-8 text-center">
+              <p className="text-sm text-muted-foreground">
+                Already have an account?{" "}
+                <Link href="/login" className="text-primary font-semibold hover:underline">
+                  Sign in
+                </Link>
+              </p>
+            </motion.div>
+
+            {status === "success" && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="mt-6 p-4 bg-green-500/10 border border-green-500/20 rounded-2xl text-green-600 dark:text-green-400 text-sm text-center font-medium"
+              >
+                Welcome to the family! Redirecting...
+              </motion.div>
+            )}
+          </div>
+        </div>
+      </motion.div>
+    </section>
+  );
  }

@@ -18,38 +18,11 @@ export function MenuClient() {
     tags: []
   });
   const [searchFocused, setSearchFocused] = useState(false);
-  const [uiLoading, setUiLoading] = useState(true);
-  const [itemsPerPage, setItemsPerPage] = useState(6); // default mobile 3 rows * 2 cols
-  const [maxButtons, setMaxButtons] = useState(3); // mobile/tablet: 3, desktop: 5
-  const [page, setPage] = useState(1);
+  const [uiLoading, setUiLoading] = useState(false);
   useEffect(() => {
-    const t = setTimeout(() => setUiLoading(false), 600);
-    return () => clearTimeout(t);
-  }, []);
-  useEffect(() => {
-    const mqLg = window.matchMedia("(min-width: 1024px)");
-    const mqMd = window.matchMedia("(min-width: 768px)");
-    const calc = () => {
-      if (mqLg.matches) {
-        setItemsPerPage(5 * 5);
-        setMaxButtons(5);
-      } else if (mqMd.matches) {
-        setItemsPerPage(2 * 2);
-        setMaxButtons(3);
-      } else {
-        setItemsPerPage(2 * 1);
-        setMaxButtons(3);
-      }
-    };
-    calc();
-    const onLgChange = () => calc();
-    const onMdChange = () => calc();
-    mqLg.addEventListener("change", onLgChange);
-    mqMd.addEventListener("change", onMdChange);
-    return () => {
-      mqLg.removeEventListener("change", onLgChange);
-      mqMd.removeEventListener("change", onMdChange);
-    };
+    // Optimization: Skip fake loading on production or if not needed
+    // const t = setTimeout(() => setUiLoading(false), 600);
+    // return () => clearTimeout(t);
   }, []);
 
   const filtered = foods.filter((f) => {
@@ -60,86 +33,91 @@ export function MenuClient() {
     const byTags = filter.tags.length ? filter.tags.every((t) => f.tags.includes(t)) : true;
     return byCategory && byQ && byRating && byPrice && byTags;
   });
-  useEffect(() => {
-    setPage(1);
-  }, [category, filter.q, filter.minRating, filter.maxPrice, filter.tags]);
-  const totalPages = useMemo(() => Math.max(1, Math.ceil(filtered.length / itemsPerPage)), [filtered.length, itemsPerPage]);
-  const start = (page - 1) * itemsPerPage;
-  const pageItems = filtered.slice(start, start + itemsPerPage);
-  const fillerCount = Math.max(0, itemsPerPage - pageItems.length);
-  const visiblePages = useMemo(() => {
-    const count = Math.min(maxButtons, totalPages);
-    const half = Math.floor(count / 2);
-    let startPage = Math.max(1, page - half);
-    if (startPage + count - 1 > totalPages) {
-      startPage = Math.max(1, totalPages - count + 1);
-    }
-    return Array.from({ length: count }, (_, i) => startPage + i);
-  }, [page, totalPages, maxButtons]);
 
   return (
-    <>
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-        <TypewriterH1 text="Explore Menu" glow className="font-display text-3xl font-bold" />
-        <p className="mt-2 opacity-80 text-sm">Browse categories and quickly find your favorites.</p>
-      </motion.div>
-      <CategoryNav active={category} onSelect={(c) => { setCategory(c); setFilter({ ...filter, category: c }); }} />
+    <div className="relative">
+      {/* Page Background Elements */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gradient-to-b from-primary/5 to-transparent pointer-events-none -z-10" />
+      <div className="absolute top-20 left-0 w-64 h-64 bg-orange-500/5 blur-[100px] rounded-full pointer-events-none -z-10 animate-pulse" />
+      <div className="absolute top-40 right-0 w-72 h-72 bg-primary/5 blur-[120px] rounded-full pointer-events-none -z-10 animate-pulse" style={{ animationDelay: '1s' }} />
+
+      <div className="relative z-40 mb-6 md:mb-10">
+        <CategoryNav active={category} onSelect={(c) => { setCategory(c); setFilter({ ...filter, category: c }); }} />
+      </div>
+
       <motion.div
-        className="mt-4 sticky top-16 z-30"
-        initial={{ opacity: 0, y: 8 }}
+        className="mb-8 md:mb-12 sticky top-20 z-30 max-w-2xl mx-auto px-4 md:px-0"
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
       >
         <motion.div
-          className="glass rounded-2xl p-2 md:p-3 flex items-center gap-2 border border-white/10"
-          animate={searchFocused ? { boxShadow: "0 0 0 6px rgba(255, 122, 0, 0.15)", scale: 1.01 } : { boxShadow: "0 0 0 0 rgba(0,0,0,0)", scale: 1 }}
-          transition={{ type: "spring", stiffness: 260, damping: 24 }}
+          className="bg-white/80 backdrop-blur-xl rounded-[2rem] p-1.5 md:p-2 flex items-center gap-2 border border-white/20 shadow-2xl"
+          animate={searchFocused ? {
+            boxShadow: "0 0 0 6px rgba(255, 122, 0, 0.1), 0 20px 40px -10px rgba(0,0,0,0.1)",
+            scale: 1.02,
+            borderColor: "rgba(255, 122, 0, 0.3)"
+          } : {
+            boxShadow: "0 10px 30px -5px rgba(0,0,0,0.08)",
+            scale: 1,
+            borderColor: "rgba(0,0,0,0.05)"
+          }}
         >
+          <div className={`p-2.5 md:p-3 rounded-2xl transition-colors duration-300 ${searchFocused ? "bg-primary text-white" : "bg-gray-100 text-gray-400"}`}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-4 h-4 md:w-5 md:h-5">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.3-4.3" strokeLinecap="round" />
+            </svg>
+          </div>
           <input
             type="text"
             placeholder="Search food..."
+            className="flex-1 bg-transparent border-none outline-none text-gray-900 placeholder:text-gray-400 font-medium text-base md:text-lg px-1 md:px-2"
             value={filter.q}
+            onChange={(e) => setFilter({ ...filter, q: e.target.value })}
             onFocus={() => setSearchFocused(true)}
             onBlur={() => setSearchFocused(false)}
-            onChange={(e) => setFilter({ ...filter, q: e.target.value })}
-            className="w-full bg-transparent outline-none px-2 py-2 md:px-3 md:py-2 rounded-xl"
-            aria-label="Search dishes"
           />
           {filter.q && (
             <motion.button
-              whileTap={{ scale: 0.95 }}
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              whileTap={{ scale: 0.9 }}
               onClick={() => setFilter({ ...filter, q: "" })}
               aria-label="Clear search"
-              className="glass rounded-xl p-2"
+              className="bg-white/10 hover:bg-white/20 rounded-2xl p-2.5 mr-1 transition-colors"
               title="Clear"
             >
               <IconClose className="h-4 w-4" />
             </motion.button>
           )}
         </motion.div>
+
+        {filter.q && (
+          <motion.p
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mt-4 text-sm font-medium text-primary/80"
+          >
+            Found {filtered.length} {filtered.length === 1 ? 'delicacy' : 'delicacies'} for "{filter.q}"
+          </motion.p>
+        )}
       </motion.div>
+
       {uiLoading ? (
-        <div className="mt-6 grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          {Array.from({ length: 12 }).map((_, i) => (
-            <div key={i}>
-              <div className="glass rounded-2xl overflow-hidden">
-                <div className="relative aspect-[4/3]">
-                  <div className="absolute inset-0 skeleton" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 md:gap-8">
+          {Array.from({ length: 10 }).map((_, i) => (
+            <div key={i} className="glass rounded-3xl overflow-hidden border border-white/10">
+              <div className="aspect-[4/3] skeleton" />
+              <div className="p-6 space-y-4">
+                <div className="h-6 w-3/4 rounded-lg skeleton" />
+                <div className="space-y-2">
+                  <div className="h-4 w-full rounded-md skeleton" />
+                  <div className="h-4 w-5/6 rounded-md skeleton" />
                 </div>
-                <div className="p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="space-y-2">
-                      <div className="h-4 w-32 rounded skeleton" />
-                      <div className="h-3 w-40 rounded skeleton" />
-                      <div className="mt-2 flex gap-2">
-                        <div className="h-5 w-14 rounded skeleton" />
-                        <div className="h-5 w-12 rounded skeleton" />
-                        <div className="h-5 w-12 rounded skeleton" />
-                      </div>
-                    </div>
-                    <div className="h-5 w-12 rounded skeleton" />
-                  </div>
-                  <div className="mt-3 h-9 w-full rounded-xl skeleton" />
+                <div className="flex justify-between items-center pt-2">
+                  <div className="h-8 w-20 rounded-xl skeleton" />
+                  <div className="h-10 w-28 rounded-xl skeleton" />
                 </div>
               </div>
             </div>
@@ -149,61 +127,59 @@ export function MenuClient() {
         <>
           <AnimatePresence mode="wait">
             <motion.div
-              key={`${page}-${itemsPerPage}`}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ type: "spring", stiffness: 280, damping: 30 }}
-              className="mt-6 grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-4"
-            >
-              {pageItems.map((item) => (
-                <div key={item.slug}>
+              key={`${category}-${filter.q}`}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              variants={{
+                hidden: { opacity: 0 },
+                visible: {
+                  opacity: 1,
+                  transition: { staggerChildren: 0.05 }
+                },
+                exit: { opacity: 0, transition: { duration: 0.2 } }
+            }}
+            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-8 px-2 md:px-0"
+          >
+            {filtered.map((item) => (
+                <motion.div
+                  key={item.slug}
+                  variants={{
+                    hidden: { opacity: 0, y: 20, scale: 0.95 },
+                    visible: { opacity: 1, y: 0, scale: 1 }
+                  }}
+                  transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                >
                   <ProductCard item={item} />
-                </div>
+                </motion.div>
               ))}
-              {Array.from({ length: fillerCount }).map((_, i) => (
-                <div key={`filler-${i}`} className="opacity-0 pointer-events-none select-none">
-                  <div className="glass rounded-2xl overflow-hidden">
-                    <div className="relative aspect-[4/3]" />
-                    <div className="p-4" />
+              {filtered.length === 0 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="col-span-full py-20 text-center"
+                >
+                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-6 text-primary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-10 h-10">
+                      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+                    </svg>
                   </div>
-                </div>
-              ))}
+                  <h3 className="text-2xl font-bold mb-2">No delicacies found</h3>
+                  <p className="opacity-60 max-w-md mx-auto">
+                    We couldn't find any items matching your search. Try adjusting your filters or browsing our categories.
+                  </p>
+                  <button
+                    onClick={() => { setCategory(undefined); setFilter({ ...filter, q: "", category: undefined }); }}
+                    className="mt-8 px-8 py-3 bg-primary text-white rounded-2xl font-semibold shadow-lg shadow-primary/20 hover:scale-105 transition-transform"
+                  >
+                    View Full Menu
+                  </button>
+                </motion.div>
+              )}
             </motion.div>
           </AnimatePresence>
-          <div className="mt-8 flex items-center justify-center gap-2">
-            <button
-              className="glass rounded-xl px-3 py-2 text-sm disabled:opacity-50"
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page === 1}
-            >
-              ‹ Prev
-            </button>
-            <div className="flex items-center gap-1">
-              {visiblePages.map((n) => {
-                const active = n === page;
-                return (
-                  <button
-                    key={n}
-                    aria-current={active ? "page" : undefined}
-                    onClick={() => setPage(n)}
-                    className={`relative px-3 py-2 rounded-xl text-sm ${active ? "bg-accent text-accent-foreground shadow" : "glass hover:bg-accent/40"}`}
-                  >
-                    {n}
-                  </button>
-                );
-              })}
-            </div>
-            <button
-              className="glass rounded-xl px-3 py-2 text-sm disabled:opacity-50"
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page === totalPages}
-            >
-              Next ›
-            </button>
-          </div>
         </>
       )}
-    </>
+    </div>
   );
 }

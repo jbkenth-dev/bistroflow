@@ -11,6 +11,7 @@ export function NavBar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
+  const isHome = pathname === "/";
   const { items } = useCart();
   const itemCount = items.reduce((sum, i) => sum + i.qty, 0);
   const links = [
@@ -32,15 +33,55 @@ export function NavBar() {
         transition={{ type: "spring", stiffness: 500, damping: 40 }}
         className="px-0 py-0"
       >
-        <div className={`px-4 py-3 flex items-center justify-between transition-[box-shadow,background-color] bg-white border border-black/5 ${scrolled ? "shadow-md" : "shadow-sm"}`}>
-          <Link href="/" className="flex items-center gap-2">
-            <span className="font-display text-xl font-semibold">
-              <span className="text-primary">BISTRO</span>
-              <span>FLOW</span>
+        <div
+          className={`px-4 py-3 flex items-center justify-between transition-all ${
+            isHome
+              ? scrolled
+                ? "bg-white border border-black/5 shadow-md"
+                : "glass border border-white/10 shadow-sm"
+              : `bg-white border border-black/5 ${scrolled ? "shadow-md" : "shadow-sm"}`
+          }`}
+        >
+          <Link href="/" className="flex items-center gap-3 group/logo">
+            <div className="relative w-10 h-10 group-hover/logo:scale-110 transition-transform duration-500">
+              <img
+                src="/assets/bistroflow-logo.jpg"
+                alt="Bistroflow Logo"
+                className="w-full h-full object-contain rounded-xl shadow-lg border border-white/20"
+              />
+            </div>
+            <span className="font-display text-xl font-bold tracking-tight">
+              <span className="text-primary group-hover/logo:text-orange-400 transition-colors">BISTRO</span>
+              <span className={isHome && !scrolled ? "text-white" : "text-black"}>FLOW</span>
             </span>
           </Link>
-          <nav className="hidden md:flex gap-2 relative">
+          <nav className={`hidden md:flex gap-2 relative ${isHome && !scrolled ? "text-white" : ""}`}>
             <LayoutGroup>
+              <Link
+                key="/"
+                href="/"
+                aria-current={isHome ? "page" : undefined}
+                className={`relative px-3 py-2 rounded-xl text-sm`}
+              >
+                {isHome && (
+                  <motion.span
+                    layoutId="navActiveBg"
+                    className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary via-orange-400 to-orange-500 shadow-lg shadow-black/40"
+                    transition={{ type: "spring", stiffness: 500, damping: 40 }}
+                    style={{ zIndex: 0 }}
+                  />
+                )}
+                <span className={`relative z-10 ${isHome ? "text-white drop-shadow" : "opacity-90"}`}>
+                  Home
+                </span>
+                {isHome && (
+                  <motion.span
+                    layoutId="navActiveUnderline"
+                    className="absolute left-2 right-2 bottom-1 h-0.5 rounded-full bg-gradient-to-r from-primary to-orange-500"
+                    transition={{ type: "spring", stiffness: 600, damping: 35 }}
+                  />
+                )}
+              </Link>
               {links.map((l) => {
                 const active = pathname === l.href;
                 return (
@@ -49,16 +90,16 @@ export function NavBar() {
                     href={l.href}
                     aria-current={active ? "page" : undefined}
                     className={`relative px-3 py-2 rounded-xl text-sm`}
-                  >
+                    >
                     {active && (
                       <motion.span
                         layoutId="navActiveBg"
-                        className="absolute inset-0 rounded-xl bg-accent"
+                        className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary via-orange-400 to-orange-500 shadow-lg shadow-black/40"
                         transition={{ type: "spring", stiffness: 500, damping: 40 }}
                         style={{ zIndex: 0 }}
                       />
                     )}
-                    <span className={`relative z-10 ${active ? "text-accent-foreground" : "opacity-90"}`}>
+                    <span className={`relative z-10 ${active ? "text-white drop-shadow" : "opacity-90"}`}>
                       {l.label}
                     </span>
                     {active && (
@@ -74,15 +115,20 @@ export function NavBar() {
             </LayoutGroup>
           </nav>
           <div className="flex items-center gap-3">
-            <Link href="/login" className={`hidden md:inline-flex ${btnSecondary} text-sm`}>
-              Log In
+            <Link
+              href="/login"
+              className={`hidden md:inline-flex ${btnSecondary} ${isHome && !scrolled ? "text-white hover:bg-white/10" : ""} text-sm items-center gap-2`}
+            >
+              <IconKey className="h-4 w-4" />
+              <span>Log In</span>
             </Link>
-            <Link href="/signup" className={`hidden md:inline-flex ${btnPrimary} text-sm`}>
-              Sign Up
+            <Link href="/signup" className={`hidden md:inline-flex ${btnPrimary} text-sm items-center gap-2`}>
+              <IconPlus className="h-4 w-4" />
+              <span>Sign Up</span>
             </Link>
             {/* Cart link removed per request; rely on floating FAB for cart */}
             <button
-              className="md:hidden rounded-xl px-3 py-2"
+              className={`md:hidden rounded-xl px-3 py-2 ${isHome && !scrolled ? "text-white" : ""}`}
               onClick={() => setOpen((v) => !v)}
               aria-expanded={open}
               aria-label="Toggle navigation"
@@ -112,10 +158,17 @@ export function NavBar() {
               aria-label="Navigation"
             >
               <div className="flex items-center justify-between">
-                <Link href="/" className="inline-flex items-center gap-2">
-                  <span className="font-display text-lg font-semibold">
+                <Link href="/" className="flex items-center gap-2 group/logo" onClick={() => setOpen(false)}>
+                  <div className="relative w-8 h-8">
+                    <img
+                      src="/assets/bistroflow-logo.jpg"
+                      alt="Bistroflow Logo"
+                      className="w-full h-full object-contain rounded-lg shadow-md border border-white/20"
+                    />
+                  </div>
+                  <span className="font-display text-lg font-bold tracking-tight">
                     <span className="text-primary">BISTRO</span>
-                    <span>FLOW</span>
+                    <span className="text-black">FLOW</span>
                   </span>
                 </Link>
                 <button aria-label="Close menu" className="rounded-xl p-2" onClick={() => setOpen(false)}>
@@ -123,6 +176,19 @@ export function NavBar() {
                 </button>
               </div>
               <div className="flex flex-col gap-2">
+                <Link
+                  href="/"
+                  aria-current={isHome ? "page" : undefined}
+                  className={`px-3 py-2 rounded-xl flex items-center justify-between ${
+                    isHome ? "bg-gradient-to-r from-primary via-orange-400 to-orange-500 text-white shadow-md" : "hover:bg-accent/50"
+                  }`}
+                  onClick={() => setOpen(false)}
+                >
+                  <span className="inline-flex items-center gap-2">
+                    <span>Home</span>
+                  </span>
+                  {isHome && <span className="ml-2 inline-block h-2 w-2 rounded-full bg-primary" />}
+                </Link>
                 {links.map((l) => {
                   const active = pathname === l.href;
                   return (
@@ -130,7 +196,9 @@ export function NavBar() {
                       key={l.href}
                       href={l.href}
                       aria-current={active ? "page" : undefined}
-                      className={`px-3 py-2 rounded-xl flex items-center justify-between ${active ? "bg-accent text-accent-foreground" : "hover:bg-accent/50"}`}
+                      className={`px-3 py-2 rounded-xl flex items-center justify-between ${
+                        active ? "bg-gradient-to-r from-primary via-orange-400 to-orange-500 text-white shadow-md" : "hover:bg-accent/50"
+                      }`}
                       onClick={() => setOpen(false)}
                     >
                       <span className="inline-flex items-center gap-2">

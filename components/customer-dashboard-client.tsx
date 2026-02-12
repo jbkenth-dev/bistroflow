@@ -197,10 +197,6 @@
                      <IconArrowRight className="w-4 h-4" />
                      <span>Browse Menu</span>
                    </Link>
-                   <Link href="/reservation" className="glass rounded-xl px-3 py-2 inline-flex items-center gap-2 hover:bg-white/7">
-                     <IconDineIn className="w-4 h-4" />
-                     <span>Make Reservation</span>
-                   </Link>
                    <Link href="/promotions" className="glass rounded-xl px-3 py-2 inline-flex items-center gap-2 hover:bg-white/7">
                      <IconCash className="w-4 h-4" />
                      <span>View Promotions</span>
