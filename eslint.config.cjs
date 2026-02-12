@@ -1,5 +1,6 @@
-import tsParser from "@typescript-eslint/parser";
-export default [
+const tsParser = require("@typescript-eslint/parser");
+
+module.exports = [
   {
     ignores: ["node_modules/**", ".next/**"]
   },

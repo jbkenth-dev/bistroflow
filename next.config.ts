@@ -2,20 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  // Static generation focus
+  // Standalone output is best for Docker/Vercel
   output: "standalone",
-  eslint: {
-    // Warning: This allows production builds to successfully complete even if
-    // your project has ESLint errors.
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    // !! WARN !!
-    // Dangerously allow production builds to successfully complete even if
-    // your project has type errors.
-    // !! WARN !!
-    ignoreBuildErrors: true,
-  },
   images: {
     domains: ["images.unsplash.com", "cdn.jsdelivr.net", "picsum.photos", "placehold.co"],
     remotePatterns: [
