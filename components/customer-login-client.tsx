@@ -149,7 +149,7 @@ export function CustomerLoginClient() {
                   <label htmlFor="login-password" className="block text-sm font-medium text-foreground/80">
                     Password
                   </label>
-                  <Link href="/forgot-password" weights="medium" className="text-xs text-primary hover:underline">
+                  <Link href="/forgot-password" className="text-xs text-primary font-medium hover:underline">
                     Forgot password?
                   </Link>
                 </div>

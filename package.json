@@ -2,6 +2,7 @@
   "name": "bistroflow",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "BISTROFLOW – Integrated Food Order & Reservation Experience for East Gate Bistro (frontend-only showcase)",
   "scripts": {
     "dev": "next dev",
