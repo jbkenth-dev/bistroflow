@@ -48,6 +48,7 @@ export default function LandingPage() {
                   onLoad={() => setBgLoaded(true)}
                   onError={() => setBgLoaded(true)}
                 />
+                <div className="absolute inset-0 bg-black/40" aria-hidden />
               </motion.div>
             </div>
             <Particles count={18} className="pointer-events-none hidden md:block" colorClass="bg-primary/20" />
@@ -80,7 +81,7 @@ export default function LandingPage() {
                 <TypewriterH1
                   id="hero-title"
                   text="East Gate Bistro"
-                  className="font-display text-[clamp(2.75rem,8.5vw,6rem)] font-bold tracking-tight leading-tight bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-400 to-orange-600"
+                  className="font-display text-[clamp(4.5rem,13vw,10rem)] font-black tracking-tighter leading-[0.8] bg-clip-text text-transparent bg-gradient-to-br from-white via-orange-400 to-primary"
                 />
               </div>
               <motion.div
@@ -164,7 +165,7 @@ export default function LandingPage() {
             <TypewriterH1
               id="ann-title"
               text="Announcements"
-              className="font-display text-5xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-400 to-orange-500 mx-auto"
+              className="font-display text-5xl md:text-7xl font-black bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-400 to-orange-500 mx-auto tracking-tight"
             />
             <p className="mt-6 text-lg opacity-70 max-w-2xl mx-auto leading-relaxed">Stay updated with the latest happenings, menu launches, and exclusive offers from East Gate Bistro.</p>
           </motion.div>
@@ -267,7 +268,7 @@ export default function LandingPage() {
               <TypewriterH1
                 id="sys-title"
                 text="System Overview"
-                className="font-display text-5xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-400 to-orange-500"
+                className="font-display text-5xl md:text-7xl font-black bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-400 to-orange-500 tracking-tight"
               />
               <p className="mt-8 text-xl opacity-70 leading-relaxed font-medium">
                 BistroFlow is our comprehensive management suite designed to streamline every aspect of the dining experience, from the first click to the final bite.
@@ -393,7 +394,7 @@ export default function LandingPage() {
                 style={{ border: 0 }}
                 allowFullScreen={true}
                 loading="lazy"
-                className="grayscale hover:grayscale-0 transition-all duration-700"
+                className="transition-all duration-700"
               ></iframe>
               <div className="absolute inset-0 pointer-events-none border-[12px] border-white/5 rounded-[3rem]" />
             </motion.div>

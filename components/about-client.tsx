@@ -97,8 +97,7 @@ export function AboutClient() {
             </div>
             <TypewriterH1
               text="Our Story & Vision"
-              glow
-              className="text-4xl sm:text-6xl md:text-8xl font-display font-bold mb-4 md:mb-8 tracking-tighter text-glow-strong"
+              className="text-5xl sm:text-7xl md:text-9xl font-display font-black mb-4 md:mb-8 tracking-tighter bg-clip-text text-transparent bg-gradient-to-br from-white via-orange-400 to-primary leading-[0.8]"
             />
             <p className="text-lg sm:text-xl md:text-3xl opacity-90 max-w-3xl mx-auto font-light leading-relaxed text-white/80">
               Crafting <span className="text-white font-medium italic">unforgettable culinary journeys</span> through passion, tradition, and digital innovation.
@@ -338,12 +337,12 @@ export function AboutClient() {
                 transition={{ delay: 0.2 }}
                 className="space-y-3 md:space-y-4 pt-6 md:pt-8"
               >
-                <div className="relative aspect-square rounded-[1.5rem] md:rounded-[2rem] overflow-hidden group">
+                <div className="relative aspect-[4/5] rounded-[1.5rem] md:rounded-[2rem] overflow-hidden group">
                   <SafeImage
                     src="/assets/table-3.jpg"
                     alt="Quiet Corner"
                     fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-700 grayscale group-hover:grayscale-0"
+                    className="object-cover group-hover:scale-110 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                   <div className="absolute top-3 right-3 md:top-6 md:right-6">
@@ -430,11 +429,11 @@ export function AboutClient() {
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3931.23650232139!2d123.2690159!3d10.1182837!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33abe3980202cf9d%3A0xdb11899a1529cdb!2sEAST%20GATE%20BISTRO!5e0!3m2!1sen!2sph!4v1628076942474!5m2!1sen!2sph"
                 width="100%"
                 height="100%"
-                style={{ border: 0, filter: 'grayscale(0.5) contrast(1.1)' }}
+                style={{ border: 0 }}
                 allowFullScreen={true}
                 loading="lazy"
+                className="transition-all duration-700"
               ></iframe>
-              <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/20 to-transparent" />
             </div>
           </div>
         </div>

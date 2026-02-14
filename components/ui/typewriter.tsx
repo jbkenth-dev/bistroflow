@@ -54,7 +54,6 @@ export function TypewriterH1({
         aria-label={text}
       >
         {display}
-        <span className="inline-block w-[1ch] align-baseline animate-pulse">|</span>
       </motion.span>
     );
   }
@@ -68,7 +67,6 @@ export function TypewriterH1({
       aria-label={text}
     >
       {display}
-      <span className="inline-block w-[1ch] align-baseline animate-pulse">|</span>
     </motion.h1>
   );
  }
