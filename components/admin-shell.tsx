@@ -1,150 +1,208 @@
- "use client";
+"use client";
 
- import { motion } from "framer-motion";
- import Link from "next/link";
- import { useEffect, useState } from "react";
- import { usePathname } from "next/navigation";
- import { IconMenu, IconHome, IconCart, IconList, IconUsers, IconChart, IconSettings } from "@/components/ui/icons";
+import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  IconMenu, IconHome, IconCart, IconList, IconUsers, IconChart,
+  IconSettings, IconLogOut, IconSearch, IconBell, IconChevronDown, IconReport
+} from "@/components/ui/icons";
 
- export function AdminShell({ children }: { children: React.ReactNode }) {
-   const [sidebarOpen, setSidebarOpen] = useState(false);
-   const [loading, setLoading] = useState(true);
-   const pathname = usePathname();
+export function AdminShell({ children }: { children: React.ReactNode }) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const pathname = usePathname();
+  const router = useRouter();
 
-   useEffect(() => {
-     const t = setTimeout(() => setLoading(false), 800);
-     return () => clearTimeout(t);
-   }, []);
+  useEffect(() => {
+    // Simulate initial loading for smooth transition
+    const t = setTimeout(() => setLoading(false), 500);
+    return () => clearTimeout(t);
+  }, []);
 
-   const navGroups = [
-     { title: "Overview", items: [{ label: "Overview", href: "/admin/dashboard", icon: IconHome }] },
-     {
-       title: "Management",
-       items: [
-         { label: "Orders", href: "/admin/orders", icon: IconCart, badge: "12" },
-         { label: "Menu", href: "/admin/menu", icon: IconList, badge: "48" },
-         { label: "Staff", href: "/admin/staff", icon: IconUsers },
-       ],
-     },
-     { title: "Insights", items: [{ label: "Analytics", href: "/admin/analytics", icon: IconChart }] },
-     { title: "System", items: [{ label: "Settings", href: "/admin/settings", icon: IconSettings }] },
-   ];
+  const handleLogout = () => {
+    document.cookie = "admin_session=; path=/; max-age=0";
+    router.push("/admin/login");
+  };
 
-   return (
-     <div className="min-h-[100dvh]">
-       <header className="sticky top-0 z-30 bg-background/70 backdrop-blur border-b border-white/10">
-         <div className="container-edge py-3 flex items-center justify-between">
-           <div className="flex items-center gap-3">
-             <motion.button
-               type="button"
-               onClick={() => setSidebarOpen((v) => !v)}
-               whileHover={{ scale: 1.05 }}
-               whileTap={{ scale: 0.95 }}
-               aria-label="Toggle menu"
-               className="md:hidden glass rounded-xl p-2"
-             >
-               <IconMenu className="w-5 h-5" />
-             </motion.button>
-            <Link href="/admin/dashboard" className="font-display text-xl font-bold tracking-tight">
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-400 to-orange-600">BISTRO</span>
-              <span className="text-black">FLOW</span>
-            </Link>
-           </div>
-           <div className="flex items-center gap-3">
-             {loading ? (
-               <motion.div
-                 initial={{ backgroundPosition: "0% 0%" }}
-                 animate={{ backgroundPosition: "100% 0%" }}
-                 transition={{ repeat: Infinity, duration: 1.6, ease: "linear" }}
-                 className="hidden md:block rounded-xl w-[280px] h-9"
-                 style={{
-                   backgroundImage:
-                     "linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.25) 37%, rgba(255,255,255,0.06) 63%)",
-                   backgroundSize: "400% 100%",
-                 }}
-               />
-             ) : (
-               <input
-                 type="search"
-                 placeholder="Search"
-                 className="hidden md:block glass rounded-xl px-3 py-2 w-[280px] border border-white/10 outline-none focus:ring-2 focus:ring-primary/50"
-               />
-             )}
-             {loading ? (
-               <motion.div
-                 initial={{ backgroundPosition: "0% 0%" }}
-                 animate={{ backgroundPosition: "100% 0%" }}
-                 transition={{ repeat: Infinity, duration: 1.6, ease: "linear" }}
-                 className="rounded-full w-9 h-9"
-                 style={{
-                   backgroundImage:
-                     "linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.25) 37%, rgba(255,255,255,0.06) 63%)",
-                   backgroundSize: "400% 100%",
-                 }}
-               />
-             ) : (
-               <div className="glass rounded-full w-9 h-9 grid place-items-center font-semibold">A</div>
-             )}
-           </div>
-         </div>
-       </header>
+  const navGroups = [
+    {
+      title: "Overview",
+      items: [{ label: "Dashboard", href: "/admin/dashboard", icon: IconHome }]
+    },
+    {
+      title: "Management",
+      items: [
+        { label: "Orders", href: "/admin/orders", icon: IconCart, badge: "12" },
+        { label: "Menu", href: "/admin/menu", icon: IconList, badge: "48" },
+        { label: "Staff", href: "/admin/staff", icon: IconUsers },
+      ],
+    },
+    {
+      title: "Insights",
+      items: [
+        { label: "Analytics", href: "/admin/analytics", icon: IconChart },
+        { label: "Reports", href: "/admin/reports", icon: IconReport },
+      ]
+    },
+    {
+      title: "System",
+      items: [{ label: "Settings", href: "/admin/settings", icon: IconSettings }]
+    },
+  ];
 
-       <div className="container-edge grid grid-cols-12 gap-6 py-6">
-         <aside className={`${sidebarOpen ? "block" : "hidden"} md:block md:col-span-3 lg:col-span-2`}>
-           <motion.div initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="glass rounded-2xl p-4 border border-white/10">
-             {loading ? (
-               <div className="space-y-2">
-                 {Array.from({ length: 6 }).map((_, i) => (
-                   <motion.div
-                     key={i}
-                     initial={{ backgroundPosition: "0% 0%" }}
-                     animate={{ backgroundPosition: "100% 0%" }}
-                     transition={{ repeat: Infinity, duration: 1.6, ease: "linear" }}
-                     className="h-9 rounded-xl"
-                     style={{
-                       backgroundImage:
-                         "linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.25) 37%, rgba(255,255,255,0.06) 63%)",
-                       backgroundSize: "400% 100%",
-                     }}
-                   />
-                 ))}
-               </div>
-             ) : (
-               <nav className="space-y-4">
-                 {navGroups.map((group) => (
-                   <div key={group.title} className="space-y-1">
-                     <div className="px-3 pb-1 text-xs uppercase tracking-wide opacity-50">{group.title}</div>
-                     {group.items.map((n) => {
-                       const I = n.icon;
-                       const active = pathname?.startsWith(n.href);
-                       return (
-                         <Link
-                           key={n.href}
-                           href={n.href}
-                           className={`relative flex items-center justify-between px-3 py-2 rounded-xl transition-colors ${active ? "bg-white/7 ring-1 ring-primary/40" : "hover:bg-white/5"}`}
-                         >
-                           {active ? <motion.div layoutId="sidebar-active" className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r" /> : null}
-                           <span className="flex items-center gap-3">
-                             <span className={`${active ? "bg-primary/15 text-primary" : "glass"} rounded-lg p-2`}>
-                               <I className="w-4 h-4" />
-                             </span>
-                             <span className="text-sm font-medium">{n.label}</span>
-                           </span>
-                           {"badge" in n && n.badge ? (
-                             <span className={`text-xs px-2 py-1 rounded-lg ${active ? "bg-primary/20 text-primary" : "bg-white/10"}`}>{n.badge}</span>
-                           ) : null}
-                         </Link>
-                       );
-                     })}
-                   </div>
-                 ))}
-               </nav>
-             )}
-           </motion.div>
-         </aside>
+  return (
+    <div className="min-h-screen bg-muted/20 flex font-sans text-foreground">
+      {/* Mobile Sidebar Backdrop */}
+      <AnimatePresence>
+        {sidebarOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSidebarOpen(false)}
+            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden"
+          />
+        )}
+      </AnimatePresence>
 
-         <main className="col-span-12 md:col-span-9 lg:col-span-10">{children}</main>
-       </div>
-     </div>
-   );
- }
+      {/* Sidebar */}
+      <motion.aside
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border shadow-xl md:shadow-none transform transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:inset-auto md:flex md:flex-col ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        {/* Logo Area */}
+        <div className="h-16 flex items-center px-6 border-b border-border">
+          <Link href="/admin/dashboard" className="flex items-center gap-3 group/logo">
+            <div className="relative w-10 h-10 group-hover/logo:scale-110 transition-transform duration-500">
+              <Image
+                src="/assets/bistroflow-logo.jpg"
+                alt="Bistroflow Logo"
+                fill
+                className="object-contain rounded-xl shadow-sm border border-border"
+              />
+            </div>
+            <span className="font-display text-xl font-bold tracking-tight">
+              <span className="text-primary group-hover/logo:text-orange-400 transition-colors">BISTRO</span>
+              <span className="text-foreground">FLOW</span>
+            </span>
+          </Link>
+        </div>
+
+        {/* Navigation */}
+        <div className="flex-1 overflow-y-auto py-6 px-4 space-y-6">
+          {navGroups.map((group) => (
+            <div key={group.title}>
+              <h3 className="px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                {group.title}
+              </h3>
+              <nav className="space-y-1">
+                {group.items.map((item) => {
+                  const isActive = pathname === item.href || pathname?.startsWith(item.href + "/");
+                  const Icon = item.icon;
+
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setSidebarOpen(false)}
+                      className={`group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                        isActive
+                          ? "bg-primary/10 text-primary shadow-sm"
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Icon className={`w-5 h-5 ${isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"}`} />
+                        <span>{item.label}</span>
+                      </div>
+                      {item.badge && (
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                          isActive
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-muted text-muted-foreground group-hover:bg-background group-hover:text-foreground shadow-sm border border-border"
+                        }`}>
+                          {item.badge}
+                        </span>
+                      )}
+                    </Link>
+                  );
+                })}
+              </nav>
+            </div>
+          ))}
+        </div>
+
+        {/* User Profile Summary at Bottom */}
+        <div className="p-4 border-t border-border space-y-2">
+          <button className="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-muted transition-colors text-left group">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-primary to-orange-400 p-[2px]">
+              <div className="w-full h-full rounded-full bg-card flex items-center justify-center overflow-hidden">
+                <img src="/assets/test.jpg" alt="Admin" className="w-full h-full object-cover opacity-90" />
+              </div>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-foreground truncate">Admin User</p>
+              <p className="text-xs text-muted-foreground truncate">admin@bistroflow.com</p>
+            </div>
+          </button>
+
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 w-full p-2 rounded-lg text-red-500 hover:bg-red-500/10 transition-colors text-sm font-medium"
+          >
+            <IconLogOut className="w-5 h-5" />
+            <span>Sign Out</span>
+          </button>
+        </div>
+      </motion.aside>
+
+      {/* Main Content Wrapper */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-background">
+        {/* Top Header */}
+        <header className="sticky top-0 z-30 h-16 bg-background/80 backdrop-blur-md border-b border-border flex items-center justify-between px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="md:hidden p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <IconMenu className="w-6 h-6" />
+            </button>
+
+            {/* Search Bar */}
+            <div className="hidden md:flex items-center relative max-w-md w-full">
+              <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Search anything..."
+                className="w-64 lg:w-80 pl-9 pr-4 py-2 bg-muted/50 border-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:bg-background transition-all"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 sm:gap-4">
+            <button className="p-2 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors relative">
+              <IconBell className="w-5 h-5" />
+              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-red-500 ring-2 ring-background"></span>
+            </button>
+            <div className="h-8 w-px bg-border hidden sm:block"></div>
+             {/* Mobile User Menu Trigger (optional, already in sidebar for mobile but good for desktop header) */}
+             <div className="hidden md:flex items-center gap-2">
+                <span className="text-sm font-medium">Hello, Admin</span>
+             </div>
+          </div>
+        </header>
+
+        {/* Main Content Scroll Area */}
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+          <div className="max-w-7xl mx-auto space-y-6">
+            {children}
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}

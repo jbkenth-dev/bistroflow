@@ -80,26 +80,44 @@ export function CustomerLoginClient() {
           <div className="relative z-10">
             <motion.h2
               variants={itemVariants}
-              className="font-display text-4xl lg:text-5xl font-bold text-white leading-tight"
+              className="font-display text-4xl lg:text-5xl font-bold text-white leading-tight flex flex-col gap-2"
             >
-              Welcome back to <br /> your kitchen.
+              <div className="flex items-center gap-4">
+                Hi
+                <motion.span
+                  animate={{ rotate: [0, 14, -8, 14, -4, 10, 0, 0] }}
+                  transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 1 }}
+                  className="inline-block origin-[70%_70%]"
+                >
+                  👋
+                </motion.span>
+              </div>
+              Welcome back
             </motion.h2>
-            <motion.p variants={itemVariants} className="mt-6 text-white/80 text-lg max-w-sm">
-              Your favorite flavors are just a few clicks away. Sign in to continue your culinary experience.
-            </motion.p>
+            <motion.div variants={itemVariants} className="mt-6 flex items-start gap-4 p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10">
+              <div className="p-2 bg-white rounded-xl text-orange-500 shrink-0 shadow-lg">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-map-pin"><path d="M20 10c0 6-9 13-9 13s-9-7-9-13a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <div>
+                <h3 className="text-white font-bold text-lg mb-1">Our Location</h3>
+                <p className="text-white/80 text-sm leading-relaxed">
+                  National Highway beside Sea Oil,<br/>Guihulngan City, Negros Oriental
+                </p>
+              </div>
+            </motion.div>
           </div>
 
           <div className="relative z-10 flex gap-4">
             <div className="flex -space-x-3">
-              {[1, 2, 3, 4].map((i) => (
+              {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div key={i} className="w-10 h-10 rounded-full border-2 border-primary bg-white/20 backdrop-blur-sm flex items-center justify-center text-[10px] font-bold text-white">
                   {i}
                 </div>
               ))}
             </div>
             <div className="text-white/60 text-xs flex flex-col justify-center">
-              <span className="font-bold text-white">5k+ Reviews</span>
-              <span>Across the city</span>
+              <span className="font-bold text-white">6 Reviews</span>
+              <span>Across guihulngan city</span>
             </div>
           </div>
         </div>

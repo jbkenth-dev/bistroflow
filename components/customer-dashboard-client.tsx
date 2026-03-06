@@ -1,243 +1,304 @@
- "use client";
- 
- import { motion } from "framer-motion";
- import Link from "next/link";
- import { useEffect, useState } from "react";
- import { IconCart, IconPeso, IconStar, IconGCash, IconCash, IconDineIn, IconTakeout, IconArrowRight } from "@/components/ui/icons";
- 
- export function CustomerDashboardClient() {
-   const [loading, setLoading] = useState(true);
-   useEffect(() => {
-     const t = setTimeout(() => setLoading(false), 900);
-     return () => clearTimeout(t);
-   }, []);
- 
-   const kpis = [
-     { label: "Active Order", value: "Preparing", icon: IconCart, sub: "ETA 15 min" },
-     { label: "Rewards", value: "1,240 pts", icon: IconStar, sub: "+120 this month" },
-     { label: "Payment", value: "GCash", icon: IconGCash, sub: "Primary method" },
-     { label: "Last Total", value: "₱980", icon: IconPeso, sub: "3 items" }
-   ];
- 
-   return (
-     <div className="container-edge">
-       <div className="grid lg:grid-cols-12 gap-6">
-         <div className="lg:col-span-12">
-           <div className="flex items-center justify-between">
-             <div>
-               <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight">Your Dashboard</h1>
-               <p className="mt-1 text-sm opacity-80">Track orders, manage rewards, and explore personalized picks.</p>
-             </div>
-             <div className="hidden md:block">
+"use client";
+
+import { motion } from "framer-motion";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { IconCart, IconPeso, IconStar, IconGCash, IconCash, IconDineIn, IconTakeout, IconArrowRight, IconClock, IconMapPin, IconList, IconSettings } from "@/components/ui/icons";
+
+function Skeleton({ className, width, height }: { className?: string; width?: string | number; height?: string | number }) {
+  return (
+    <motion.div
+      initial={{ backgroundPosition: "0% 0%" }}
+      animate={{ backgroundPosition: "100% 0%" }}
+      transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+      className={`bg-gray-200/50 rounded-lg overflow-hidden ${className}`}
+      style={{
+        width,
+        height,
+        backgroundImage: "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0) 100%)",
+        backgroundSize: "200% 100%",
+      }}
+    />
+  );
+}
+
+export function CustomerDashboardClient() {
+  const [loading, setLoading] = useState(true);
+  const [greeting, setGreeting] = useState("Welcome back");
+
+  useEffect(() => {
+    const t = setTimeout(() => setLoading(false), 2000); 
+    const hour = new Date().getHours();
+    if (hour < 12) setGreeting("Good morning");
+    else if (hour < 18) setGreeting("Good afternoon");
+    else setGreeting("Good evening");
+    return () => clearTimeout(t);
+  }, []);
+
+  const kpis = [
+    { label: "Active Order", value: "Preparing", icon: IconCart, color: "text-blue-600", bg: "bg-blue-50" },
+    { label: "Payment Method", value: "GCash", icon: IconGCash, color: "text-indigo-600", bg: "bg-indigo-50" },
+    { label: "Payment Amount", value: "₱980", icon: IconPeso, color: "text-green-600", bg: "bg-green-50" }
+  ];
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
+  };
+
+  return (
+    <div className="container-edge min-h-screen pb-20">
+      <motion.div 
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="space-y-8"
+      >
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <motion.div variants={itemVariants} className="flex items-center gap-4">
+            <div className="relative group">
+              <div className="w-16 h-16 rounded-full overflow-hidden border-4 border-white shadow-lg ring-2 ring-gray-100 transform transition-transform group-hover:scale-105">
+                <img 
+                  src="https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" 
+                  alt="Profile" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-white rounded-full shadow-sm animate-pulse"></div>
+            </div>
+            <div>
+              <h1 className="font-display text-3xl md:text-4xl font-bold tracking-tight text-gray-900">
+                {greeting}, <span className="text-primary">Alex</span>
+              </h1>
+              <div className="flex items-center gap-2 mt-2">
+                <div className="flex rounded-md overflow-hidden shadow-sm border border-gray-200">
+                  <div className="bg-gray-100 px-2 py-1 flex items-center justify-center border-r border-gray-200">
+                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">ID</span>
+                  </div>
+                  <div className="bg-white px-3 py-1 flex items-center justify-center min-w-[60px]">
+                    <span className="text-xs font-mono font-bold text-gray-800 tracking-wide">883-921</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+          
+          <motion.div variants={itemVariants} className="flex items-center gap-3">
+            {/* Search removed */}
+          </motion.div>
+        </div>
+
+        {/* KPIs Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {loading ? (
+            Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-32 rounded-2xl" />
+            ))
+          ) : (
+            kpis.map((k, i) => {
+              const Icon = k.icon;
+              return (
+                <motion.div
+                  variants={itemVariants}
+                  key={i}
+                  whileHover={{ scale: 1.02, backgroundColor: "rgba(255,255,255,0.8)" }}
+                  className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group cursor-pointer transition-colors hover:shadow-md"
+                >
+                  <div className={`absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity ${k.color}`}>
+                    <Icon className="w-16 h-16 transform rotate-12" />
+                  </div>
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className={`p-2 rounded-lg ${k.bg} ${k.color}`}>
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <span className="text-sm font-medium text-gray-500">{k.label}</span>
+                    </div>
+                    <div className="text-2xl font-bold mb-1 text-gray-900">{k.value}</div>
+                  </div>
+                </motion.div>
+              );
+            })
+          )}
+        </div>
+
+        <div className="grid lg:grid-cols-12 gap-6">
+          {/* Main Content Area */}
+          <div className="lg:col-span-8 space-y-6">
+            
+            {/* Active Order Progress */}
+            <motion.div variants={itemVariants} className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm overflow-hidden relative">
+              {loading ? (
+                <div className="space-y-4">
+                  <div className="flex justify-between">
+                    <Skeleton className="w-32 h-6" />
+                    <Skeleton className="w-24 h-6" />
+                  </div>
+                  <Skeleton className="w-full h-24 rounded-xl" />
+                  <Skeleton className="w-full h-2 rounded-full" />
+                </div>
+              ) : (
+                <>
+                  <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+                    <div>
+                      <h2 className="text-xl font-bold flex items-center gap-2 text-gray-900">
+                        Active Order 
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">#20341</span>
+                      </h2>
+                      <div className="flex items-center gap-2 text-sm text-gray-500 mt-1">
+                        <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                        Preparing your meal • Chicken Parm, Coke, Fries...
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <div className="px-4 py-2 rounded-xl bg-gray-50 border border-gray-100 text-xs font-medium text-center">
+                          <span className="block text-gray-400 text-[10px] uppercase tracking-wider">Estimated Time</span>
+                          <span className="text-lg font-bold text-primary">15 min</span>
+                        </div>
+                    </div>
+                  </div>
+
+                  <div className="relative py-4">
+                    <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-100 -translate-y-1/2 rounded-full" />
+                    <div className="absolute top-1/2 left-0 h-1 bg-primary -translate-y-1/2 rounded-full transition-all duration-1000" style={{ width: "50%" }} />
+                    
+                    <div className="grid grid-cols-4 relative z-10">
+                      {[
+                        { label: "Placed", icon: IconCart, active: true, completed: true },
+                        { label: "Preparing", icon: IconClock, active: true, completed: false },
+                        { label: "Ready", icon: IconTakeout, active: false, completed: false },
+                        { label: "Served", icon: IconDineIn, active: false, completed: false },
+                      ].map((step, i) => (
+                        <div key={i} className="flex flex-col items-center gap-3 group">
+                          <div className={`
+                            w-10 h-10 rounded-full flex items-center justify-center border-4 transition-all duration-500
+                            ${step.active ? "bg-primary border-white text-white scale-110 shadow-lg shadow-primary/30" : 
+                              step.completed ? "bg-primary border-white text-white" : "bg-gray-100 border-white text-gray-300 group-hover:border-gray-200"}
+                          `}>
+                            <step.icon className="w-4 h-4" />
+                          </div>
+                          <span className={`text-xs font-medium transition-colors ${step.active ? "text-primary font-bold" : "text-gray-400"}`}>
+                            {step.label}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+            </motion.div>
+
+            {/* Recent Orders Table */}
+            <motion.div variants={itemVariants} className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
                {loading ? (
-                 <motion.div
-                   initial={{ backgroundPosition: "0% 0%" }}
-                   animate={{ backgroundPosition: "100% 0%" }}
-                   transition={{ repeat: Infinity, duration: 1.6, ease: "linear" }}
-                   className="rounded-xl w-[220px] h-9"
-                   style={{
-                     backgroundImage:
-                       "linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.25) 37%, rgba(255,255,255,0.06) 63%)",
-                     backgroundSize: "400% 100%",
-                   }}
-                 />
+                <div className="space-y-4">
+                  <Skeleton className="w-40 h-7 mb-6" />
+                  {[1,2,3].map(i => (
+                    <Skeleton key={i} className="w-full h-16 rounded-xl" />
+                  ))}
+                </div>
                ) : (
-                 <input
-                   type="search"
-                   placeholder="Search orders or dishes"
-                   className="glass rounded-xl px-3 py-2 w-[220px] border border-white/10 outline-none focus:ring-2 focus:ring-primary/50"
-                 />
+                 <>
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-bold text-gray-900">Recent Orders</h2>
+                    <Link href="/orders" className="text-sm text-primary hover:text-primary/80 transition-colors font-medium flex items-center gap-1">
+                      View All <IconArrowRight className="w-3 h-3" />
+                    </Link>
+                  </div>
+                  
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="text-left text-xs text-gray-400 uppercase tracking-wider border-b border-gray-100">
+                          <th className="pb-4 pl-4 font-medium">Order ID</th>
+                          <th className="pb-4 font-medium">Items</th>
+                          <th className="pb-4 font-medium">Date</th>
+                          <th className="pb-4 font-medium">Total</th>
+                          <th className="pb-4 font-medium text-center">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-50">
+                        {[
+                          { id: "#20340", items: "Chicken Parm, Coke...", date: "Today, 12:30 PM", total: "₱540", status: "Completed" },
+                          { id: "#20339", items: "Beef Steak, Rice...", date: "Yesterday", total: "₱380", status: "Completed" },
+                          { id: "#20338", items: "Pasta Carbonara...", date: "Oct 24", total: "₱760", status: "Cancelled" },
+                        ].map((order) => (
+                          <tr key={order.id} className="group hover:bg-gray-50 transition-colors">
+                            <td className="py-4 pl-4 font-medium text-gray-900">{order.id}</td>
+                            <td className="py-4 text-sm text-gray-600">{order.items}</td>
+                            <td className="py-4 text-sm text-gray-500">{order.date}</td>
+                            <td className="py-4 font-medium text-gray-900">{order.total}</td>
+                            <td className="py-4 text-center">
+                              <span className={`
+                                inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border
+                                ${order.status === "Completed" ? "bg-green-50 text-green-700 border-green-200" : 
+                                  order.status === "Cancelled" ? "bg-red-50 text-red-700 border-red-200" : "bg-gray-50 text-gray-600 border-gray-200"}
+                              `}>
+                                {order.status}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                 </>
                )}
-             </div>
-           </div>
-         </div>
- 
-         <div className="lg:col-span-12">
-           <motion.div
-             initial={{ opacity: 0, y: 8 }}
-             animate={{ opacity: 1, y: 0 }}
-             transition={{ duration: 0.4 }}
-             className="grid md:grid-cols-4 gap-4"
-           >
-             {kpis.map((k, i) => {
-               const I = k.icon;
-               return (
-                 <motion.div
-                   key={k.label}
-                   initial={{ opacity: 0, y: 6, scale: 0.98 }}
-                   animate={{ opacity: 1, y: 0, scale: 1 }}
-                   transition={{ delay: i * 0.05, duration: 0.35 }}
-                   className="glass rounded-2xl p-4 border border-white/10"
-                 >
-                   <div className="flex items-center justify-between gap-3">
-                     <div>
-                       <div className="text-xs opacity-60">{k.label}</div>
-                       <div className="mt-1 text-lg font-semibold">{k.value}</div>
-                     </div>
-                     <div className="glass rounded-xl p-2">
-                       <I className="w-5 h-5" />
-                     </div>
-                   </div>
-                   <div className="mt-2 text-xs opacity-60">{k.sub}</div>
-                 </motion.div>
-               );
-             })}
-           </motion.div>
-         </div>
- 
-         <div className="lg:col-span-8">
-           <motion.div
-             initial={{ opacity: 0, y: 8 }}
-             animate={{ opacity: 1, y: 0 }}
-             transition={{ duration: 0.4 }}
-             className="glass rounded-2xl p-4 border border-white/10"
-           >
-             {loading ? (
-               <div>
-                 <div className="h-5 w-32 rounded skeleton" />
-                 <div className="mt-3 h-40 w-full rounded-xl skeleton" />
-               </div>
-             ) : (
-               <div>
-                 <div className="flex items-center justify-between">
-                   <div className="font-semibold">Order Progress</div>
-                   <div className="text-xs opacity-60">#20341 • Dine-In</div>
-                 </div>
-                 <div className="mt-4 grid grid-cols-4 gap-3">
-                   {[
-                     { label: "Placed", done: true },
-                     { label: "Preparing", done: true },
-                     { label: "Ready", done: false },
-                     { label: "Served", done: false },
-                   ].map((s, i) => (
-                     <div key={i} className="text-center">
-                       <div className={`mx-auto w-10 h-10 rounded-full ${s.done ? "bg-primary/25 text-primary" : "bg-white/10"} flex items-center justify-center`}>
-                         {s.done ? <IconCart className="w-5 h-5" /> : <IconTakeout className="w-5 h-5" />}
-                       </div>
-                       <div className="mt-2 text-xs opacity-80">{s.label}</div>
-                     </div>
-                   ))}
-                 </div>
-                 <div className="mt-4 h-2 w-full rounded-full bg-white/10">
-                   <div className="h-2 rounded-full bg-primary" style={{ width: "50%" }} />
-                 </div>
-               </div>
-             )}
-           </motion.div>
- 
-           <motion.div
-             initial={{ opacity: 0, y: 8 }}
-             animate={{ opacity: 1, y: 0 }}
-             transition={{ duration: 0.4 }}
-             className="mt-4 glass rounded-2xl p-4 border border-white/10"
-           >
-             {loading ? (
-               <div>
-                 <div className="h-5 w-40 rounded skeleton" />
-                 <div className="mt-3 h-24 w-full rounded-xl skeleton" />
-               </div>
-             ) : (
-               <div>
-                 <div className="flex items-center justify-between">
-                   <div className="font-semibold">Recent Orders</div>
-                   <Link href="/menu" className="text-sm hover:underline">Order again</Link>
-                 </div>
-                 <div className="mt-3 overflow-x-auto">
-                   <table className="min-w-full text-sm">
-                     <thead className="text-left">
-                       <tr className="border-b border-white/10">
-                         <th className="py-2 pr-4">Order</th>
-                         <th className="py-2 pr-4">Method</th>
-                         <th className="py-2 pr-4">Items</th>
-                         <th className="py-2 pr-4">Total</th>
-                         <th className="py-2 pr-4">Status</th>
-                       </tr>
-                     </thead>
-                     <tbody>
-                       {[
-                         { id: "#20340", method: "Takeout", items: 3, total: "₱540", status: "Completed" },
-                         { id: "#20339", method: "Dine-In", items: 2, total: "₱380", status: "Completed" },
-                         { id: "#20338", method: "Takeout", items: 4, total: "₱760", status: "Cancelled" },
-                       ].map((o) => (
-                         <tr key={o.id} className="border-b border-white/5">
-                           <td className="py-2 pr-4">{o.id}</td>
-                           <td className="py-2 pr-4">{o.method}</td>
-                           <td className="py-2 pr-4">{o.items}</td>
-                           <td className="py-2 pr-4">{o.total}</td>
-                           <td className="py-2 pr-4">{o.status}</td>
-                         </tr>
-                       ))}
-                     </tbody>
-                   </table>
-                 </div>
-               </div>
-             )}
-           </motion.div>
-         </div>
- 
-         <div className="lg:col-span-4">
-           <motion.div
-             initial={{ opacity: 0, y: 8 }}
-             animate={{ opacity: 1, y: 0 }}
-             transition={{ duration: 0.4 }}
-             className="glass rounded-2xl p-4 border border-white/10"
-           >
-             {loading ? (
-               <div>
-                 <div className="h-5 w-28 rounded skeleton" />
-                 <div className="mt-3 h-9 w-full rounded-xl skeleton" />
-                 <div className="mt-2 h-9 w-full rounded-xl skeleton" />
-                 <div className="mt-2 h-9 w-full rounded-xl skeleton" />
-               </div>
-             ) : (
-               <div>
-                 <div className="font-semibold">Quick Actions</div>
-                 <div className="mt-3 grid gap-2">
-                   <Link href="/menu" className="glass rounded-xl px-3 py-2 inline-flex items-center gap-2 hover:bg-white/7">
-                     <IconArrowRight className="w-4 h-4" />
-                     <span>Browse Menu</span>
-                   </Link>
-                   <Link href="/promotions" className="glass rounded-xl px-3 py-2 inline-flex items-center gap-2 hover:bg-white/7">
-                     <IconCash className="w-4 h-4" />
-                     <span>View Promotions</span>
-                   </Link>
-                 </div>
-               </div>
-             )}
-           </motion.div>
- 
-           <motion.div
-             initial={{ opacity: 0, y: 8 }}
-             animate={{ opacity: 1, y: 0 }}
-             transition={{ duration: 0.4 }}
-             className="mt-4 glass rounded-2xl p-4 border border-white/10"
-           >
-             {loading ? (
-               <div>
-                 <div className="h-5 w-32 rounded skeleton" />
-                 <div className="mt-3 h-28 w-full rounded-xl skeleton" />
-               </div>
-             ) : (
-               <div>
-                 <div className="flex items-center justify-between">
-                   <div className="font-semibold">Preferences</div>
-                   <div className="text-xs opacity-60">Recent</div>
-                 </div>
-                 <div className="mt-3 grid grid-cols-2 gap-3">
-                   <div className="glass rounded-xl p-3 flex items-center justify-between">
-                     <span className="text-sm">Dine-In</span>
-                     <IconDineIn className="w-5 h-5" />
-                   </div>
-                   <div className="glass rounded-xl p-3 flex items-center justify-between">
-                     <span className="text-sm">Takeout</span>
-                     <IconTakeout className="w-5 h-5" />
-                   </div>
-                 </div>
-               </div>
-             )}
-           </motion.div>
-         </div>
-       </div>
-     </div>
-   );
- }
+            </motion.div>
+          </div>
+
+          {/* Sidebar Area */}
+          <div className="lg:col-span-4 space-y-6">
+            
+            {/* Preferences / Recent Locations */}
+            <motion.div variants={itemVariants} className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
+              {loading ? (
+                <div className="space-y-3">
+                  <Skeleton className="w-24 h-6 mb-4" />
+                  <div className="grid grid-cols-2 gap-3">
+                    <Skeleton className="h-24 rounded-2xl" />
+                    <Skeleton className="h-24 rounded-2xl" />
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-bold text-lg text-gray-900">Order Type</h3>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button className="flex flex-col items-center justify-center p-4 rounded-2xl bg-primary/10 border border-primary/20 ring-1 ring-primary/20 transition-all gap-2 text-center relative overflow-hidden group">
+                      <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-primary shadow-sm">
+                        <IconDineIn className="w-5 h-5" />
+                      </div>
+                      <span className="text-xs font-bold text-primary">Dine-In</span>
+                      <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-primary animate-pulse" />
+                    </button>
+                    <button className="flex flex-col items-center justify-center p-4 rounded-2xl bg-gray-50 border border-gray-100 hover:bg-gray-100 transition-colors gap-2 text-center">
+                      <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-orange-400 shadow-sm">
+                        <IconTakeout className="w-5 h-5" />
+                      </div>
+                      <span className="text-xs font-medium text-gray-500">Takeout</span>
+                    </button>
+                  </div>
+                </>
+              )}
+            </motion.div>
+
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
