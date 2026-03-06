@@ -202,20 +202,17 @@ export function CheckoutContent() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setPayment("gcash")}
-                    className={`relative rounded-xl md:rounded-2xl px-4 py-3 md:py-4 border transition-[box-shadow,transform] ${payment === "gcash" ? "border-transparent shadow-md" : "glass border-white/10"}`}
+                    className={`relative rounded-xl md:rounded-2xl px-4 py-3 md:py-4 border-2 transition-all flex items-center gap-2 ${payment === "gcash" ? "border-primary bg-primary/5 shadow-inner" : "glass border-white/10 hover:bg-white/10"}`}
                   >
+                    <IconGCash className={`h-5 w-5 ${payment === "gcash" ? "text-primary" : "opacity-60"}`} />
+                    <span className={`text-sm md:text-base font-semibold ${payment === "gcash" ? "text-primary" : "opacity-60"}`}>GCash</span>
                     {payment === "gcash" && (
-                      <motion.span
+                      <motion.div
                         layoutId="paymentActiveBg"
-                        className="absolute inset-0 rounded-xl md:rounded-2xl bg-accent"
+                        className="absolute inset-0 border-2 border-primary rounded-xl md:rounded-2xl pointer-events-none"
                         transition={{ type: "spring", stiffness: 500, damping: 40 }}
-                        style={{ zIndex: 0 }}
                       />
                     )}
-                    <span className="relative z-10 inline-flex items-center gap-2 text-sm md:text-base font-semibold">
-                      <IconGCash className="h-5 w-5" />
-                      <span>GCash</span>
-                    </span>
                   </motion.button>
                   <motion.button
                     role="radio"
@@ -223,20 +220,17 @@ export function CheckoutContent() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setPayment("cash")}
-                    className={`relative rounded-xl md:rounded-2xl px-4 py-3 md:py-4 border transition-[box-shadow,transform] ${payment === "cash" ? "border-transparent shadow-md" : "glass border-white/10"}`}
+                    className={`relative rounded-xl md:rounded-2xl px-4 py-3 md:py-4 border-2 transition-all flex items-center gap-2 ${payment === "cash" ? "border-primary bg-primary/5 shadow-inner" : "glass border-white/10 hover:bg-white/10"}`}
                   >
+                    <IconCash className={`h-5 w-5 ${payment === "cash" ? "text-primary" : "opacity-60"}`} />
+                    <span className={`text-sm md:text-base font-semibold ${payment === "cash" ? "text-primary" : "opacity-60"}`}>Cash</span>
                     {payment === "cash" && (
-                      <motion.span
+                      <motion.div
                         layoutId="paymentActiveBg"
-                        className="absolute inset-0 rounded-xl md:rounded-2xl bg-accent"
+                        className="absolute inset-0 border-2 border-primary rounded-xl md:rounded-2xl pointer-events-none"
                         transition={{ type: "spring", stiffness: 500, damping: 40 }}
-                        style={{ zIndex: 0 }}
                       />
                     )}
-                    <span className="relative z-10 inline-flex items-center gap-2 text-sm md:text-base font-semibold">
-                      <IconCash className="h-5 w-5" />
-                      <span>Cash</span>
-                    </span>
                   </motion.button>
                 </div>
               </LayoutGroup>
@@ -321,10 +315,6 @@ export function CheckoutContent() {
               </div>
 
               <div className="mt-6 space-y-3 pt-6 border-t border-white/10">
-                <div className="flex items-center justify-between text-xs md:text-sm font-medium opacity-70">
-                  <span>Subtotal</span>
-                  <span><IconPeso className="h-[1em] w-[1em] inline mr-0.5" />{grand.toFixed(2)}</span>
-                </div>
                 <div className="flex items-center justify-between text-lg font-black text-primary">
                   <span>Total</span>
                   <span><IconPeso className="h-[1em] w-[1em] inline mr-0.5" />{grand.toFixed(2)}</span>

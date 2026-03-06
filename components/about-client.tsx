@@ -412,16 +412,7 @@ export function AboutClient() {
                 </div>
               </div>
 
-              <div className="mt-8 md:mt-12 p-6 md:p-8 rounded-2xl md:rounded-3xl bg-primary/5 border border-primary/10">
-                <h4 className="font-bold mb-2 flex items-center gap-2 text-sm md:text-base">
-                  <IconSettings className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-                  Powered by BistroFlow
-                </h4>
-                <p className="text-xs md:text-sm opacity-60 leading-relaxed">
-                  Experience the future of dining with our integrated management suite,
-                  designed for speed, precision, and the ultimate guest satisfaction.
-                </p>
-              </div>
+
             </div>
 
             <div className="relative h-[300px] md:h-[400px] rounded-[1.5rem] md:rounded-[2rem] overflow-hidden ring-1 ring-white/10">

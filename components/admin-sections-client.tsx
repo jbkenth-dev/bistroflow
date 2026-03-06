@@ -1,94 +1,109 @@
- "use client";
+"use client";
 
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { IconCart, IconList, IconUsers, IconChart, IconSettings } from "@/components/ui/icons";
 
 function SectionShell({ title, icon: Icon }: { title: string; icon: React.ComponentType<React.SVGProps<SVGSVGElement>> }) {
-   const [loading, setLoading] = useState(true);
-   useEffect(() => {
-     const t = setTimeout(() => setLoading(false), 900);
-     return () => clearTimeout(t);
-   }, []);
+  const [loading, setLoading] = useState(true);
 
-   return (
-    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="glass rounded-2xl p-6 border border-white/10">
-      <div className="flex items-center gap-3">
-        <span className="glass rounded-lg p-3"><Icon className="w-5 h-5" /></span>
-        <h1 className="font-semibold text-lg">{title}</h1>
+  useEffect(() => {
+    const t = setTimeout(() => setLoading(false), 900);
+    return () => clearTimeout(t);
+  }, []);
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">{title}</h1>
+          <p className="text-muted-foreground text-sm">Manage your {title.toLowerCase()} here.</p>
+        </div>
+        <div className="p-2 bg-primary/10 rounded-lg text-primary">
+          <Icon className="w-6 h-6" />
+        </div>
       </div>
-         {loading ? (
-           <div className="mt-6 space-y-3">
-             {Array.from({ length: 6 }).map((_, i) => (
-               <motion.div
-                 key={i}
-                 initial={{ backgroundPosition: "0% 0%" }}
-                 animate={{ backgroundPosition: "100% 0%" }}
-                 transition={{ repeat: Infinity, duration: 1.6, ease: "linear" }}
-                 className="h-10 rounded-xl"
-                 style={{
-                   backgroundImage:
-                     "linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.25) 37%, rgba(255,255,255,0.06) 63%)",
-                   backgroundSize: "400% 100%",
-                 }}
-               />
-             ))}
-        </div>
-      ) : (
-        <div className="mt-6">
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="glass rounded-xl p-4 border border-white/10">
-              <div className="font-medium">Summary</div>
-              <div className="mt-2 text-sm opacity-70">This section will show live data when connected.</div>
-            </div>
-            <div className="glass rounded-xl p-4 border border-white/10">
-              <div className="font-medium">Activity</div>
-              <div className="mt-2 text-sm opacity-70">Recent items and actions appear here.</div>
-            </div>
-          </div>
-          <div className="mt-6 glass rounded-xl p-4 border border-white/10">
-            <div className="font-medium">List</div>
-            <div className="mt-3 overflow-x-auto">
-              <table className="min-w-full text-sm">
-                <thead>
-                  <tr className="border-b border-white/10">
-                    <th className="py-2 pr-4">Name</th>
-                    <th className="py-2 pr-4">Status</th>
-                    <th className="py-2 pr-4">Updated</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {["Item A", "Item B", "Item C", "Item D"].map((n, i) => (
-                    <tr key={n} className="border-b border-white/5">
-                      <td className="py-2 pr-4">{n}</td>
-                      <td className="py-2 pr-4">
-                        <span className={`px-2 py-1 rounded-lg text-xs ${i % 2 === 0 ? "bg-green-500/20 text-green-500" : "bg-white/10"}`}>{i % 2 === 0 ? "Active" : "Draft"}</span>
-                      </td>
-                      <td className="py-2 pr-4">Today</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
-    </motion.div>
-   );
- }
 
- export function OrdersClient() {
-   return <SectionShell title="Orders" icon={IconCart} />;
- }
- export function MenuClient() {
-   return <SectionShell title="Menu" icon={IconList} />;
- }
- export function StaffClient() {
-   return <SectionShell title="Staff" icon={IconUsers} />;
- }
- export function AnalyticsClient() {
-   return <SectionShell title="Analytics" icon={IconChart} />;
- }
- export function SettingsClient() {
-   return <SectionShell title="Settings" icon={IconSettings} />;
- }
+      <motion.div 
+        initial={{ opacity: 0, y: 10 }} 
+        animate={{ opacity: 1, y: 0 }} 
+        transition={{ duration: 0.4 }} 
+        className="bg-card border border-border rounded-xl shadow-sm overflow-hidden"
+      >
+        {loading ? (
+          <div className="p-6 space-y-4">
+            <div className="h-8 w-1/3 bg-muted rounded animate-pulse"></div>
+            <div className="h-4 w-1/4 bg-muted rounded animate-pulse"></div>
+            <div className="space-y-2 mt-8">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="h-12 w-full bg-muted rounded animate-pulse"></div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="p-6">
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
+              <div className="bg-muted/30 border border-border rounded-xl p-4">
+                <h3 className="font-semibold text-foreground">Summary</h3>
+                <p className="mt-2 text-sm text-muted-foreground">This section will show live data when connected.</p>
+              </div>
+              <div className="bg-muted/30 border border-border rounded-xl p-4">
+                <h3 className="font-semibold text-foreground">Activity</h3>
+                <p className="mt-2 text-sm text-muted-foreground">Recent items and actions appear here.</p>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-lg mb-4 text-foreground">List View</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm text-left">
+                  <thead className="text-xs text-muted-foreground uppercase bg-muted/50">
+                    <tr>
+                      <th className="px-6 py-3 rounded-l-lg">Name</th>
+                      <th className="px-6 py-3">Status</th>
+                      <th className="px-6 py-3 rounded-r-lg">Updated</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {["Item A", "Item B", "Item C", "Item D"].map((n, i) => (
+                      <tr key={n} className="border-b border-border last:border-0 hover:bg-muted/5 transition-colors">
+                        <td className="px-6 py-4 font-medium text-foreground">{n}</td>
+                        <td className="px-6 py-4">
+                          <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            i % 2 === 0 
+                              ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" 
+                              : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
+                          }`}>
+                            {i % 2 === 0 ? "Active" : "Draft"}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-muted-foreground">Today</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+      </motion.div>
+    </div>
+  );
+}
+
+export function OrdersClient() {
+  return <SectionShell title="Orders" icon={IconCart} />;
+}
+export function MenuClient() {
+  return <SectionShell title="Menu" icon={IconList} />;
+}
+export function StaffClient() {
+  return <SectionShell title="Staff" icon={IconUsers} />;
+}
+export function AnalyticsClient() {
+  return <SectionShell title="Analytics" icon={IconChart} />;
+}
+export function SettingsClient() {
+  return <SectionShell title="Settings" icon={IconSettings} />;
+}
