@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   // Standalone output is best for Docker/Vercel
   output: "standalone",
   images: {
-    domains: ["images.unsplash.com", "cdn.jsdelivr.net", "picsum.photos", "placehold.co"],
+    domains: ["images.unsplash.com", "cdn.jsdelivr.net", "picsum.photos", "placehold.co", "localhost"],
     remotePatterns: [
       {
         protocol: "https",
@@ -22,6 +22,10 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "placehold.co",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
       }
     ]
   }

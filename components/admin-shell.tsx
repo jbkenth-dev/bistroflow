@@ -7,22 +7,45 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
   IconMenu, IconHome, IconCart, IconList, IconUsers, IconChart,
-  IconSettings, IconLogOut, IconSearch, IconBell, IconChevronDown, IconReport
+  IconSettings, IconLogOut, IconSearch, IconBell, IconChevronDown, IconReport,
+  IconGrid
 } from "@/components/ui/icons";
+import { useAuth } from "@/store/auth";
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const pathname = usePathname();
   const router = useRouter();
+  const { user, isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
+    // Auth Check
+    if (!isAuthenticated) {
+        // If not authenticated, redirect to login
+        // Use router.push to admin login instead of default login
+        router.push("/admin/login");
+        return;
+    }
+
+    if (user?.role !== 'admin') {
+        // If staff tries to access admin, redirect to staff dashboard
+        if (user?.role === 'staff') {
+            router.replace("/staff/dashboard");
+        } else {
+            // If customer, redirect to main
+            router.replace("/dashboard");
+        }
+        return;
+    }
+
     // Simulate initial loading for smooth transition
     const t = setTimeout(() => setLoading(false), 500);
     return () => clearTimeout(t);
-  }, []);
+  }, [isAuthenticated, user, router]);
 
   const handleLogout = () => {
+    logout();
     document.cookie = "admin_session=; path=/; max-age=0";
     router.push("/admin/login");
   };
@@ -37,6 +60,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       items: [
         { label: "Orders", href: "/admin/orders", icon: IconCart, badge: "12" },
         { label: "Menu", href: "/admin/menu", icon: IconList, badge: "48" },
+        { label: "Table Floor", href: "/admin/floor", icon: IconGrid },
         { label: "Staff", href: "/admin/staff", icon: IconUsers },
       ],
     },
@@ -49,7 +73,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     },
     {
       title: "System",
-      items: [{ label: "Settings", href: "/admin/settings", icon: IconSettings }]
+      items: [
+        { label: "Settings", href: "/admin/settings", icon: IconSettings },
+        { label: "Logout", onClick: handleLogout, icon: IconLogOut, className: "text-red-500 hover:bg-red-50 hover:text-red-600" }
+      ]
     },
   ];
 
@@ -100,9 +127,30 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 {group.title}
               </h3>
               <nav className="space-y-1">
-                {group.items.map((item) => {
-                  const isActive = pathname === item.href || pathname?.startsWith(item.href + "/");
+                {group.items.map((item: any) => {
                   const Icon = item.icon;
+
+                  if (item.onClick) {
+                    return (
+                      <button
+                        key={item.label}
+                        onClick={() => {
+                          item.onClick();
+                          setSidebarOpen(false);
+                        }}
+                        className={`w-full group flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                          item.className || "text-muted-foreground hover:bg-muted hover:text-foreground"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <Icon className={`w-5 h-5 ${item.className ? "" : "text-muted-foreground group-hover:text-foreground"}`} />
+                          <span>{item.label}</span>
+                        </div>
+                      </button>
+                    );
+                  }
+
+                  const isActive = pathname === item.href || pathname?.startsWith(item.href + "/");
 
                   return (
                     <Link

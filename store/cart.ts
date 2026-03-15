@@ -14,6 +14,7 @@ type CartState = {
   inc: (slug: string) => void;
   dec: (slug: string) => void;
   total: () => number;
+  clear: () => void;
 };
 
 export const useCart = create<CartState>()(
@@ -43,7 +44,8 @@ export const useCart = create<CartState>()(
             .map((i) => (i.item.slug === slug ? { ...i, qty: Math.max(0, i.qty - 1) } : i))
             .filter((i) => i.qty > 0)
         })),
-      total: () => get().items.reduce((sum, i) => sum + i.item.price * i.qty, 0)
+      total: () => get().items.reduce((sum, i) => sum + i.item.price * i.qty, 0),
+      clear: () => set({ items: [] })
     }),
     {
       name: "bistroflow-cart",

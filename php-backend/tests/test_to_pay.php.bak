@@ -1,0 +1,65 @@
+<?php
+// Test Script for To Pay Field
+
+require_once __DIR__ . '/../src/Database.php';
+
+$database = new Database();
+$db = $database->getConnection();
+
+// Helper to make GET request
+function getRequest($url) {
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $result = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    return ['code' => $httpCode, 'body' => json_decode($result, true)];
+}
+
+echo "=== Setting up Test Data for To Pay ===\n";
+try {
+    $db->beginTransaction();
+    
+    // Create User
+    $stmt = $db->prepare("INSERT INTO users (first_name, last_name, email, password_hash) VALUES ('Test', 'To Pay', 'topay_test@example.com', 'hash')");
+    $stmt->execute();
+    $userId = $db->lastInsertId();
+    echo "Created User ID: $userId\n";
+
+    // Create Active Cash Order
+    $stmt = $db->prepare("INSERT INTO orders (user_id, order_type, payment_method, subtotal, total_amount, status, created_at) VALUES (?, 'dine-in', 'cash', 150.50, 150.50, 'preparing', NOW())");
+    $stmt->execute([$userId]);
+    $orderId = $db->lastInsertId();
+    echo "Created Cash Order ID: $orderId (Total: 150.50)\n";
+
+    $db->commit();
+
+    echo "\n=== Testing API Response ===\n";
+    $res = getRequest("http://localhost/bistroflow/bistroflow/php-backend/public/api/active-order.php?userId=$userId");
+
+    if ($res['code'] === 200 && $res['body']['success']) {
+        $data = $res['body']['data'];
+        $paymentMethod = $data['payment_method'];
+        $totalAmount = number_format((float)$data['total_amount'], 2, '.', ',');
+        
+        echo "Payment Method: $paymentMethod\n";
+        echo "Total Amount: $totalAmount\n";
+
+        if ($paymentMethod === 'cash' && $totalAmount === '150.50') {
+            echo "PASSED: Correctly identified Cash order with amount 150.50\n";
+        } else {
+            echo "FAILED: Data mismatch\n";
+        }
+    } else {
+        echo "FAILED: API Error\n";
+    }
+
+} catch (Exception $e) {
+    $db->rollBack();
+    die("Setup Failed: " . $e->getMessage() . "\n");
+} finally {
+    // Cleanup
+    $db->exec("DELETE FROM users WHERE id = $userId");
+    echo "\nTest data cleaned up.\n";
+}
+?>

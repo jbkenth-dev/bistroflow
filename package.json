@@ -10,7 +10,8 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "preinstall": "node preinstall.js"
+    "preinstall": "node preinstall.js",
+    "test": "jest"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.0",
@@ -24,12 +25,17 @@
     "zustand": "^4.5.0"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/node": "^20.11.30",
     "@types/react": "^18.2.47",
+    "@types/react-dom": "^18.3.7",
     "@typescript-eslint/parser": "^8.54.0",
     "autoprefixer": "^10.4.20",
     "eslint": "^9.12.0",
     "eslint-config-next": "15.0.0",
+    "jest": "^30.3.0",
+    "jest-environment-jsdom": "^30.3.0",
     "postcss": "^8.4.33",
     "tailwindcss": "^3.4.10",
     "typescript": "^5.6.3"

@@ -2,11 +2,11 @@
 import { ProductCard } from "@/components/product-card";
 import { CategoryNav } from "@/components/category-nav";
 import { type FilterState } from "@/components/search-filter";
-import { foods } from "@/data/foods";
-import { useEffect, useMemo, useState } from "react";
+import { type FoodItem } from "@/data/foods";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { getApiUrl } from "@/lib/config";
 import { IconClose } from "@/components/ui/icons";
-import { TypewriterH1 } from "@/components/ui/typewriter";
 
 export function MenuClient() {
   const [category, setCategory] = useState<string | undefined>();
@@ -18,14 +18,62 @@ export function MenuClient() {
     tags: []
   });
   const [searchFocused, setSearchFocused] = useState(false);
-  const [uiLoading, setUiLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  
+  // Data State
+  const [products, setProducts] = useState<FoodItem[]>([]);
+  const [categories, setCategories] = useState<{ id: number; name: string }[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
-    // Optimization: Skip fake loading on production or if not needed
-    // const t = setTimeout(() => setUiLoading(false), 600);
-    // return () => clearTimeout(t);
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [catRes, prodRes] = await Promise.all([
+          fetch(getApiUrl("/categories.php")),
+          fetch(getApiUrl("/products.php"))
+        ]);
+
+        const catData = await catRes.json();
+        const prodData = await prodRes.json();
+
+        if (catData.success) {
+          setCategories(catData.data);
+        }
+
+        if (prodData.success) {
+          // Map API data to FoodItem type
+          const mappedProducts: FoodItem[] = prodData.data.map((p: any) => ({
+            id: p.id.toString(),
+            slug: p.id.toString(), 
+            name: p.food_name,
+            category: p.category_name || "Uncategorized",
+            price: Number(p.price),
+            rating: 5.0, // Default as not in DB yet
+            calories: 0, // Default
+            prepTime: 15, // Default
+            tags: [], // Default
+            image: p.image_url || "/assets/test.jpg",
+            description: p.description || ""
+          }));
+          // Remove client-side availability filter to show all products returned by API
+          // The API should handle filtering if needed, or we show them as 'Unavailable' in UI.
+          // For now, let's allow all items to flow through so we can debug "No delicacies found".
+          
+          setProducts(mappedProducts);
+        }
+      } catch (err) {
+        console.error("Failed to fetch menu data", err);
+        setError("Failed to load menu. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
-  const filtered = foods.filter((f) => {
+  const filtered = products.filter((f) => {
     const byCategory = category ? f.category === category : true;
     const byQ = filter.q ? f.name.toLowerCase().includes(filter.q.toLowerCase()) : true;
     const byRating = f.rating >= filter.minRating;
@@ -33,6 +81,26 @@ export function MenuClient() {
     const byTags = filter.tags.length ? filter.tags.every((t) => f.tags.includes(t)) : true;
     return byCategory && byQ && byRating && byPrice && byTags;
   });
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <div className="text-red-500 mb-4">
+          <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <h3 className="text-xl font-bold text-gray-900 mb-2">Something went wrong</h3>
+        <p className="text-gray-500 mb-6">{error}</p>
+        <button 
+          onClick={() => window.location.reload()}
+          className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="relative">
@@ -42,7 +110,11 @@ export function MenuClient() {
       <div className="absolute top-40 right-0 w-72 h-72 bg-primary/5 blur-[120px] rounded-full pointer-events-none -z-10 animate-pulse" style={{ animationDelay: '1s' }} />
 
       <div className="relative z-40 mb-6 md:mb-10">
-        <CategoryNav active={category} onSelect={(c) => { setCategory(c); setFilter({ ...filter, category: c }); }} />
+        <CategoryNav 
+          active={category} 
+          onSelect={(c) => { setCategory(c); setFilter({ ...filter, category: c }); }} 
+          categories={categories}
+        />
       </div>
 
       <motion.div
@@ -104,7 +176,7 @@ export function MenuClient() {
         )}
       </motion.div>
 
-      {uiLoading ? (
+      {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 md:gap-8">
           {Array.from({ length: 10 }).map((_, i) => (
             <div key={i} className="glass rounded-3xl overflow-hidden border border-white/10">

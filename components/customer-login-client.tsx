@@ -3,21 +3,86 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { IconEye, IconEyeOff } from "@/components/ui/icons";
 import { Particles } from "@/components/ui/particles";
+import { useAuth } from "@/store/auth";
 
 export function CustomerLoginClient() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { login } = useAuth();
   const [show, setShow] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const returnUrl = searchParams.get("returnUrl") || "/dashboard";
+
+  // Mock login data for now since backend login endpoint isn't fully set up in this context
+  // Ideally this would be a real API call similar to signup
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  // Removed useEffect for redirect as it is now handled in onSubmit
+  /*
+  useEffect(() => {
+    if (status === "success") {
+      const timer = setTimeout(() => {
+        router.push(returnUrl);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [status, router, returnUrl]);
+  */
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStatus("loading");
     setErrorMsg(null);
-    await new Promise((r) => setTimeout(r, 900));
-    setStatus("success");
+
+    try {
+      const response = await fetch("http://localhost/bistroflow/bistroflow/php-backend/public/api/login.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          scope: 'customer'
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed");
+      }
+
+      // Login success
+      const userRole = data.user.role || "customer";
+      login({
+          id: data.user.id,
+          firstName: data.user.firstName,
+          lastName: data.user.lastName,
+          name: `${data.user.firstName} ${data.user.lastName}`,
+          email: data.user.email,
+          role: userRole
+      });
+      setStatus("success");
+
+      // Redirect to dashboard (backend ensures this is a customer)
+      let targetUrl = returnUrl && returnUrl !== "/dashboard" ? returnUrl : "/dashboard";
+
+      setTimeout(() => {
+        router.replace(targetUrl);
+      }, 1000);
+
+    } catch (err) {
+      setStatus("error");
+      setErrorMsg(err instanceof Error ? err.message : "Something went wrong");
+    }
   }
 
   const containerVariants = {
@@ -142,24 +207,35 @@ export function CustomerLoginClient() {
 
             <motion.div variants={itemVariants}>
               <h1 id="login-title" className="font-display text-3xl font-bold tracking-tight text-foreground">
-                Sign In
+                Welcome Back
               </h1>
-              <p className="mt-2 text-muted-foreground">Enter your details to access your account.</p>
+              <p className="mt-2 text-muted-foreground">Sign in to access your account.</p>
             </motion.div>
 
-            <form className="mt-8 space-y-6" onSubmit={onSubmit} aria-describedby={errorMsg ? "login-error" : undefined}>
+            {status === "error" && errorMsg && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-600 dark:text-red-400 text-sm text-center font-medium"
+              >
+                {errorMsg}
+              </motion.div>
+            )}
+
+            <form className="mt-8 space-y-5" onSubmit={onSubmit} aria-describedby={errorMsg ? "login-error" : undefined}>
               <motion.div variants={itemVariants}>
                 <label htmlFor="login-email" className="block text-sm font-medium mb-2 text-foreground/80">
                   Email Address
                 </label>
                 <input
-                  id="login-email"
-                  type="email"
-                  required
-                  className="w-full bg-white/50 dark:bg-white/5 rounded-2xl px-4 py-3 border border-white/20 focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all"
-                  placeholder="name@example.com"
-                  autoComplete="email"
-                />
+                    id="login-email"
+                    type="email"
+                    required
+                    className="w-full bg-white/50 dark:bg-white/5 rounded-2xl px-4 py-3 border border-white/20 focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all pl-10"
+                    placeholder="name@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
               </motion.div>
 
               <motion.div variants={itemVariants}>
@@ -179,6 +255,8 @@ export function CustomerLoginClient() {
                     className="w-full bg-white/50 dark:bg-white/5 rounded-2xl px-4 py-3 pr-12 border border-white/20 focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all"
                     placeholder="••••••••"
                     autoComplete="current-password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                   <button
                     type="button"

@@ -2,16 +2,36 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { IconCart, IconPeso, IconDineIn, IconTakeout, IconCash, IconChart } from "@/components/ui/icons";
 import { SalesChart } from "@/components/ui/sales-chart";
+import { useAuth } from "@/store/auth";
 
 export function AdminDashboardClient() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const { user, isAuthenticated } = useAuth();
 
   useEffect(() => {
-    const t = setTimeout(() => setLoading(false), 1000);
+    // If user is not authenticated, redirect to login
+    if (!isAuthenticated) {
+      router.push("/admin/login");
+      return;
+    }
+
+    // If user is not admin, redirect to login
+    if (user?.role !== 'admin') {
+      router.push("/admin/login");
+      return;
+    }
+
+    // Simulate loading data
+    const t = setTimeout(() => {
+        setLoading(false);
+    }, 1000);
+
     return () => clearTimeout(t);
-  }, []);
+  }, [isAuthenticated, user, router]);
 
   const kpis = [
     { label: "Total Revenue", value: "₱128,940", icon: IconPeso, sub: "+8.4% from last week", trend: "up" },

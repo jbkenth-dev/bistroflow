@@ -3,11 +3,16 @@
  import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useMemo, useState, useEffect } from "react";
 import { IconEye, IconEyeOff } from "@/components/ui/icons";
 import { Particles } from "@/components/ui/particles";
+import { Modal, ModalBody } from "@/components/ui/modal";
+import { useAuth } from "@/store/auth";
 
 export function CustomerSignupClient() {
+   const router = useRouter();
+   const { login } = useAuth();
    const [firstName, setFirstName] = useState("");
    const [middleName, setMiddleName] = useState("");
    const [lastName, setLastName] = useState("");
@@ -32,13 +37,57 @@ export function CustomerSignupClient() {
   const canSubmit = firstName && lastName && email && pwd && pwd2 && pwd === pwd2 && score >= 3 && status !== "loading";
   const barColor = score <= 2 ? "bg-red-500" : score === 3 ? "bg-yellow-500" : "bg-green-500";
 
+  useEffect(() => {
+    if (status === "success") {
+      const timer = setTimeout(() => {
+        router.push("/dashboard");
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [status, router]);
+
   async function onSubmit(e: React.FormEvent) {
      e.preventDefault();
      if (!canSubmit) return;
      setStatus("loading");
      setErrorMsg(null);
-     await new Promise((r) => setTimeout(r, 1000));
-     setStatus("success");
+
+     try {
+       const response = await fetch("http://localhost/bistroflow/bistroflow/php-backend/public/api/register.php", {
+         method: "POST",
+         headers: {
+           "Content-Type": "application/json",
+         },
+         body: JSON.stringify({
+           firstName,
+           middleName,
+           lastName,
+           email,
+           password: pwd,
+         }),
+       });
+
+       const data = await response.json();
+
+       if (!response.ok) {
+         throw new Error(data.message || "Registration failed");
+       }
+
+       // Auto login on success
+       login({
+         id: data.userId,
+         firstName: firstName,
+         lastName: lastName,
+         name: `${firstName} ${lastName}`,
+         email: email,
+         role: 'customer'
+       });
+
+       setStatus("success");
+     } catch (err) {
+       setStatus("error");
+       setErrorMsg(err instanceof Error ? err.message : "Something went wrong");
+     }
    }
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -166,6 +215,16 @@ export function CustomerSignupClient() {
               </h1>
               <p className="mt-2 text-muted-foreground">Join Bistroflow and start your culinary journey.</p>
             </motion.div>
+
+            {status === "error" && errorMsg && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-600 dark:text-red-400 text-sm text-center font-medium"
+              >
+                {errorMsg}
+              </motion.div>
+            )}
 
             <form className="mt-8 space-y-5" onSubmit={onSubmit} aria-describedby={errorMsg ? "signup-error" : undefined}>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -324,15 +383,60 @@ export function CustomerSignupClient() {
               </p>
             </motion.div>
 
-            {status === "success" && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="mt-6 p-4 bg-green-500/10 border border-green-500/20 rounded-2xl text-green-600 dark:text-green-400 text-sm text-center font-medium"
-              >
-                Welcome to the family! Redirecting...
-              </motion.div>
-            )}
+            <Modal
+              isOpen={status === "success"}
+              onClose={() => {}}
+              hideCloseButton={true}
+              className="max-w-sm"
+            >
+              <ModalBody className="flex flex-col items-center justify-center py-8 text-center">
+                <motion.div
+                  initial={{ scale: 0, rotate: -45 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ type: "spring", duration: 0.5 }}
+                  className="mb-4 rounded-full bg-green-100 p-3 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-8 w-8"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </motion.div>
+                <motion.h3
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="mb-2 text-xl font-bold text-gray-900 dark:text-white"
+                >
+                  Welcome to the family!
+                </motion.h3>
+                <motion.p
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-sm text-gray-500 dark:text-gray-400"
+                >
+                  Redirecting to dashboard...
+                </motion.p>
+                <div className="mt-6 w-full max-w-[200px]">
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: "100%" }}
+                      transition={{ duration: 1.5, ease: "easeInOut" }}
+                      className="h-full bg-green-500"
+                    />
+                  </div>
+                </div>
+              </ModalBody>
+            </Modal>
           </div>
         </div>
       </motion.div>

@@ -52,7 +52,7 @@ export function OtpVerifyClient() {
     if (e.key === "ArrowRight" && idx < length - 1) inputsRef.current[idx + 1]?.focus();
   }
 
-  function handlePaste(e: React.ClipboardEvent<HTMLDivElement>) {
+  function handlePaste(e: React.ClipboardEvent<HTMLFormElement>) {
     const text = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, length);
     if (!text) return;
     e.preventDefault();

@@ -7,24 +7,75 @@ import { IconArrowRight, IconEye, IconEyeOff } from "@/components/ui/icons";
 import { SafeImage } from "@/components/ui/safe-image";
 import { useRef, useState } from "react";
 import { TypewriterH1 } from "@/components/ui/typewriter";
+import { useAuth } from "@/store/auth";
 
 export function AdminLoginClient() {
   const router = useRouter();
+  const { login } = useAuth();
   const sectionRef = useRef<HTMLDivElement | null>(null);
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
   const yParallax = useTransform(scrollYProgress, [0, 1], [0, 30]);
   const [role, setRole] = useState<"admin" | "staff">("admin");
   const [showPass, setShowPass] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate login delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    // Set cookie
-    document.cookie = "admin_session=true; path=/; max-age=86400; SameSite=Strict";
-    router.push("/admin/dashboard");
+    setError("");
+
+    try {
+      const res = await fetch("http://localhost/bistroflow/bistroflow/php-backend/public/api/login.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            email,
+            password,
+            scope: 'admin'
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        // Check role
+        if (data.user.role === role) {
+           // Success
+           login({
+              id: data.user.id,
+              firstName: data.user.firstName,
+              lastName: data.user.lastName,
+              name: `${data.user.firstName} ${data.user.lastName}`,
+              email: data.user.email,
+              role: data.user.role,
+              profilePic: data.user.profilePic
+           });
+
+           // Set a cookie for middleware if needed
+           document.cookie = `admin_session=true; path=/; max-age=86400; SameSite=Strict`;
+
+           if (role === 'admin') {
+             router.push("/admin/dashboard");
+           } else {
+             router.push("/staff/dashboard");
+           }
+        } else {
+           setError(`Access denied. You are not a ${role}.`);
+        }
+      } else {
+        setError(data.message || "Login failed");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("An error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -148,10 +199,13 @@ export function AdminLoginClient() {
                 </div>
 
                 <form className="space-y-4" onSubmit={handleLogin}>
+                  {error && <div className="text-red-500 text-sm text-center bg-red-50 p-2 rounded-lg">{error}</div>}
                   <div>
                     <label className="block text-sm font-medium text-muted-foreground mb-1">Email</label>
                     <input
                       type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       className="w-full bg-background rounded-xl px-3 py-2 border border-input focus:ring-2 focus:ring-primary/50 focus:border-primary/50 outline-none transition-all placeholder:text-muted-foreground/50 text-foreground"
                       placeholder="admin@bistroflow.com"
                       required
@@ -163,6 +217,8 @@ export function AdminLoginClient() {
                       <input
                         id="admin-password"
                         type={showPass ? "text" : "password"}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                         className="w-full bg-background rounded-xl px-3 py-2 pr-10 border border-input focus:ring-2 focus:ring-primary/50 focus:border-primary/50 outline-none transition-all placeholder:text-muted-foreground/50 text-foreground"
                         placeholder="••••••••"
                         autoComplete="current-password"

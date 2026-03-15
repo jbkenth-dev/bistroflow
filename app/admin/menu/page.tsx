@@ -1,12 +1,12 @@
-import { MenuClient } from "@/components/admin-sections-client";
+import { AdminMenuClient } from "@/components/admin-menu-client";
 import { AdminShell } from "@/components/admin-shell";
 
- export const metadata = { title: "Menu – Bistroflow" };
+export const metadata = { title: "Menu Management – Bistroflow Admin" };
 
- export default function MenuPage() {
+export default function AdminMenuPage() {
   return (
     <AdminShell>
-      <MenuClient />
+      <AdminMenuClient />
     </AdminShell>
   );
- }
+}

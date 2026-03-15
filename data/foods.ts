@@ -1,16 +1,10 @@
-export type Category =
-  | "Burgers"
-  | "Pizza"
-  | "Pasta"
-  | "Filipino"
-  | "Drinks"
-  | "Desserts";
+export type Category = string;
 
 export type FoodItem = {
   id: string;
   slug: string;
   name: string;
-  category: Category;
+  category: string;
   price: number;
   rating: number;
   calories: number;
