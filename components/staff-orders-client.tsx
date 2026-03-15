@@ -6,6 +6,7 @@ import {
   IconSearch, IconFilter, IconChevronLeft, IconChevronRight,
   IconCheck, IconClock, IconX, IconLoader
 } from "@/components/ui/icons";
+import { getApiUrl } from "@/lib/config";
 
 // Types
 interface OrderItem {
@@ -26,6 +27,7 @@ interface Order {
   items_summary: string;
   item_count: number;
   items: OrderItem[];
+  table_number?: string;
 }
 
 interface Pagination {
@@ -79,7 +81,7 @@ export function StaffOrdersClient() {
         search: debouncedSearch,
       });
 
-      const res = await fetch(`http://localhost/bistroflow/bistroflow/php-backend/public/api/staff/orders.php?${params}`);
+      const res = await fetch(getApiUrl(`/staff/orders.php?${params}`));
       const data = await res.json();
 
       if (data.success) {

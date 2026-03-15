@@ -2,8 +2,8 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
-import { 
-  IconPlus, IconEdit, IconTrash, IconSearch, IconClose, IconGrid, IconCheck, IconAlertCircle 
+import {
+  IconPlus, IconEdit, IconTrash, IconSearch, IconClose, IconGrid, IconCheck, IconAlertCircle
 } from "@/components/ui/icons";
 import { AlertBox, AlertType } from "@/components/ui/alert-box";
 import { SafeImage } from "@/components/ui/safe-image";
@@ -26,11 +26,11 @@ export function AdminFloorClient() {
   // Search & Pagination
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  
+
   // Modals
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  
+
   // Editing State
   const [editingLayout, setEditingLayout] = useState<FloorLayout | null>(null);
   const [itemToDelete, setItemToDelete] = useState<FloorLayout | null>(null);
@@ -62,7 +62,7 @@ export function AdminFloorClient() {
       if (debouncedSearch) {
         url.searchParams.append("q", debouncedSearch);
       }
-      
+
       const res = await fetch(url.toString());
       const data = await res.json();
       if (data.success) {
@@ -113,10 +113,10 @@ export function AdminFloorClient() {
         const uploadFormData = new FormData();
         uploadFormData.append("image", imageFile);
 
-        const res = await fetch(getApiUrl("/upload-floor-image.php"), {
-        method: "POST",
-        body: formData
-      });
+        const uploadRes = await fetch(getApiUrl("/upload-floor-image.php"), {
+          method: "POST",
+          body: uploadFormData
+        });
         const uploadData = await uploadRes.json();
 
         if (!uploadData.success) {
@@ -133,7 +133,7 @@ export function AdminFloorClient() {
 
       const url = getApiUrl("/floor_layouts.php");
       const method = editingLayout ? "PUT" : "POST";
-      const body = editingLayout 
+      const body = editingLayout
         ? { ...formData, image_path: finalImagePath, id: editingLayout.id }
         : { ...formData, image_path: finalImagePath };
 
@@ -162,7 +162,7 @@ export function AdminFloorClient() {
   const handleDelete = async () => {
     if (!itemToDelete) return;
     try {
-      const res = await fetch(getApiUrl(`/floor_layouts.php?id=${layoutToDelete.id}`), {
+      const res = await fetch(getApiUrl(`/floor_layouts.php?id=${itemToDelete.id}`), {
         method: "DELETE"
       });
       const data = await res.json();
@@ -257,9 +257,9 @@ export function AdminFloorClient() {
                 className="bg-card border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all group"
               >
                 <div className="relative aspect-video bg-muted">
-                  <img 
-                    src={layout.image_path} 
-                    alt={`Table ${layout.table_number}`} 
+                  <img
+                    src={layout.image_path}
+                    alt={`Table ${layout.table_number}`}
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
@@ -300,7 +300,7 @@ export function AdminFloorClient() {
               </motion.div>
             ))}
           </AnimatePresence>
-          
+
           {filteredLayouts.length === 0 && (
             <div className="col-span-full py-12 text-center text-muted-foreground bg-card rounded-xl border border-border border-dashed">
               <IconGrid className="w-12 h-12 mx-auto mb-3 opacity-20" />

@@ -1,9 +1,10 @@
 {
   "framework": "nextjs",
-  "builds": [
-    { "src": "package.json", "use": "@vercel/next" },
-    { "src": "php-backend/public/api/**/*.php", "use": "vercel-php@0.6.0" }
-  ],
+  "functions": {
+    "php-backend/public/api/**/*.php": {
+      "runtime": "vercel-php@0.6.0"
+    }
+  },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/php-backend/public/api/$1" }
   ]

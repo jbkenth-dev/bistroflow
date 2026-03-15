@@ -10,8 +10,11 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "preinstall": "node preinstall.js",
     "test": "jest"
+  },
+  "overrides": {
+    "glob": "^13.0.0",
+    "rimraf": "^5.0.0"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.0",

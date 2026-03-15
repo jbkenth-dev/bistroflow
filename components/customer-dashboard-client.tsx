@@ -138,6 +138,8 @@ function DashboardContent() {
         .catch(err => console.error("Failed to refresh profile:", err));
     }
 
+    if (!user) return;
+
     // Fetch Active Order from API
     const fetchActiveOrder = async () => {
       if (!user?.id) return;
@@ -165,7 +167,7 @@ function DashboardContent() {
     fetchActiveOrder();
 
     // SSE Real-time Updates
-    const sseUrl = getApiUrl(`/sse/active-order-updates.php?userId=${user.id}`);
+    const sseUrl = getApiUrl(`/sse/active-order-updates.php?userId=${user!.id}`);
     const es = new EventSource(sseUrl);
     eventSourceRef.current = es;
 
